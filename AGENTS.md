@@ -53,3 +53,4 @@ Checklist rule:
 - `go-observability` worker verification remains on `SMK-GO-004`; it proves root job spans, parent propagation, and worker metric emission for the shared helper
 - `SMK-DOC-001` is satisfied only when the package guide, platform integration contract, dashboard spec, and implementation checklist agree on env vars, smoke gates, and the current exported integration surface
 - example tasks must use dedicated smoke rows that prove the example compiles against the current package surface; do not reuse feature-level smoke rows to verify examples
+- `GO-013` must be proved by a testing-specific smoke row that confirms the unit-test inventory is explicit and aligned; do not use the final quality gate row to prove test coverage exists
