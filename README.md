@@ -60,6 +60,10 @@ Application hosts forward telemetry to the central observability stack. Grafana 
 - `deploy/`
 - `docs/`
 
+The central stack compose scaffold lives at:
+
+- `deploy/central/docker-compose.yml`
+
 ## Dashboard Baseline
 
 The initial Grafana baseline should include:
