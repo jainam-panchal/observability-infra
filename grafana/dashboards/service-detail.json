@@ -39,7 +39,7 @@
               },
               {
                 "color": "orange",
-                "value": 25
+                "value": 50
               }
             ]
           },
@@ -70,7 +70,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\",http_response_status_code=~\"$status_family\"}[15m]))",
+          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\",http_request_method=~\"$method\",http_response_status_code=~\"$status_family\"}[15m]))",
           "range": true,
           "refId": "A"
         }
@@ -132,7 +132,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\",http_response_status_code=~\"5..\"}[15m])) / clamp_min(sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"}[15m])), 1)) * 100",
+          "expr": "(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\",http_request_method=~\"$method\",http_response_status_code=~\"5..\"}[15m])) / clamp_min(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\",http_request_method=~\"$method\"}[15m])), 1)) * 100",
           "range": true,
           "refId": "A"
         }
@@ -194,7 +194,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"}[15m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\",http_request_method=~\"$method\"}[15m])))",
           "range": true,
           "refId": "A"
         }
@@ -251,7 +251,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(http_server_active_requests{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"})",
+          "expr": "sum(http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\"})",
           "range": true,
           "refId": "A"
         }
@@ -296,13 +296,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_response_status_code=~\"$status_family\"}[5m]))",
-          "legendFormat": "{{http_route}}",
+          "expr": "sum by (http_request_method) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\",http_response_status_code=~\"$status_family\"}[5m]))",
+          "legendFormat": "{{http_request_method}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Traffic By Route",
+      "title": "Ingress Request Rate By Method",
       "type": "timeseries"
     },
     {
@@ -315,7 +315,7 @@
           "color": {
             "mode": "palette-classic"
           },
-          "unit": "percent"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -342,13 +342,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_response_status_code=~\"$status_family\"}[5m])) / clamp_min(sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}[5m])), 0.0001)",
-          "legendFormat": "{{http_route}}",
+          "expr": "histogram_quantile(0.95, sum by (http_request_method, le) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\"}[5m])))",
+          "legendFormat": "{{http_request_method}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Pressure By Route",
+      "title": "Ingress P95 Latency By Method",
       "type": "timeseries"
     },
     {
@@ -360,8 +360,7 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          },
-          "unit": "s"
+          }
         },
         "overrides": []
       },
@@ -388,13 +387,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (http_response_status_code) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"}[5m]))",
+          "expr": "sum by (http_response_status_code) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route=~\"$route\",http_request_method=~\"$method\"}[5m]))",
           "legendFormat": "{{http_response_status_code}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Code Mix For Selected Route",
+      "title": "Status Code Mix",
       "type": "timeseries"
     },
     {
@@ -406,8 +405,7 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          },
-          "unit": "s"
+          }
         },
         "overrides": []
       },
@@ -433,13 +431,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}[15m]))))",
+          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_request_method=~\"$method\"}[15m])))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Slowest Routes By P95",
+      "title": "Top Routes By Volume",
       "type": "bargauge"
     },
     {
@@ -451,7 +449,8 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          }
+          },
+          "unit": "s"
         },
         "overrides": []
       },
@@ -477,19 +476,19 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[15m])))",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_request_method=~\"$method\"}[15m]))))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Top Failing Routes",
+      "title": "Slowest Routes By P95",
       "type": "bargauge"
     },
     {
       "datasource": {
-        "type": "loki",
-        "uid": "loki"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -501,11 +500,56 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
         "y": 21
       },
       "id": 10,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[15m])))",
+          "legendFormat": "{{http_route}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top Failing Routes",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [
@@ -522,12 +566,59 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({service_name=~\"$service\",deployment_environment=~\"$environment\",level=~\"$log_level\"}[5m]))",
-          "queryType": "range",
+          "expr": "sum by (server_address) (rate(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_request_method=~\"$method\"}[5m]))",
+          "legendFormat": "{{server_address}}",
+          "range": true,
           "refId": "A"
         }
       ],
-      "title": "Log Volume By Level",
+      "title": "Outbound HTTP Rate By Upstream",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (server_address, le) (rate(http_client_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_request_method=~\"$method\"}[5m])))",
+          "legendFormat": "{{server_address}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Outbound HTTP P95 By Upstream",
       "type": "timeseries"
     },
     {
@@ -538,10 +629,10 @@
       "gridPos": {
         "h": 10,
         "w": 12,
-        "x": 8,
-        "y": 21
+        "x": 12,
+        "y": 29
       },
-      "id": 11,
+      "id": 13,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -554,7 +645,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\"$service\",deployment_environment=~\"$environment\",level=\"ERROR\"}",
+          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -569,11 +660,11 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 12,
+        "w": 24,
         "x": 0,
-        "y": 29
+        "y": 39
       },
-      "id": 12,
+      "id": 14,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -586,12 +677,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\"$service\",deployment_environment=~\"$environment\",level=~\"$log_level\"}",
+          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$log_level\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Recent Logs",
+      "title": "Recent Service Logs",
       "type": "logs"
     }
   ],
@@ -607,52 +698,26 @@
   "templating": {
     "list": [
       {
+        "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "e2e-api",
-          "value": "e2e-api"
+          "text": "All",
+          "value": ".*"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(http_server_request_count_total, exported_job)",
+        "definition": "label_values(http_server_request_count_total, deployment_environment_name)",
         "hide": 0,
-        "includeAll": false,
-        "label": "Service",
-        "multi": false,
-        "name": "service",
-        "options": [],
-        "query": {
-          "qryType": 1,
-          "query": "label_values(http_server_request_count_total, exported_job)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
-        },
-        "refresh": 1,
-        "skipUrlSync": true,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "nonprod",
-          "value": "nonprod"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, deployment_environment_name)",
-        "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Environment",
         "multi": false,
         "name": "environment",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, deployment_environment_name)",
+          "query": "label_values(http_server_request_count_total, deployment_environment_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -671,7 +736,35 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}, http_route)",
+        "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Service",
+        "multi": false,
+        "name": "service",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}, http_route)",
         "hide": 0,
         "includeAll": true,
         "label": "Route",
@@ -680,7 +773,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}, http_route)",
+          "query": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}, http_route)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -695,14 +788,14 @@
           "text": "All",
           "value": ".*"
         },
-        "definition": "All : .*, 2xx : 2.., 4xx : 4.., 5xx : 5..",
+        "definition": ".*,GET,POST,PUT,PATCH,DELETE",
         "hide": 0,
         "includeAll": false,
-        "label": "Status Family",
+        "label": "Method",
         "multi": false,
-        "name": "status_family",
+        "name": "method",
         "options": [],
-        "query": ".* ,2..,4..,5..",
+        "query": ".*,GET,POST,PUT,PATCH,DELETE",
         "refresh": 1,
         "skipUrlSync": true,
         "sort": 0,
@@ -715,7 +808,27 @@
           "text": "All",
           "value": ".*"
         },
-        "definition": "All : .*, INFO : INFO, ERROR : ERROR",
+        "definition": ".*,2..,4..,5..",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Status Family",
+        "multi": false,
+        "name": "status_family",
+        "options": [],
+        "query": ".*,2..,4..,5..",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "definition": ".*,INFO,ERROR",
         "hide": 0,
         "includeAll": false,
         "label": "Log Level",
@@ -737,7 +850,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Service Detail",
-  "uid": "service-detail",
-  "version": 1,
+  "uid": "service-detail-v2",
+  "version": 2,
   "weekStart": ""
 }

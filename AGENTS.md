@@ -84,11 +84,11 @@ Checklist rule:
 - current dashboard metric contract to preserve unless the shared package changes:
   - the central Prometheus exporter must keep `resource_to_telemetry_conversion.enabled: true` so application resource attributes such as `deployment.environment` become queryable metric labels; the current exported Prometheus label name is `deployment_environment_name`
   - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, and `http_server_active_requests`
-  - service dashboard is now a no-selector operator dashboard; service, environment, status-code, and route dimensions must be visible directly in panels instead of relying on template-variable state
-  - `service-detail.json` is the dedicated single-service debugging board; it may use only `service` then `environment` selectors, and its panels must answer what is failing, which routes are hot or slow, and what logs explain the failure
+  - `service-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
+  - `service-detail.json` is the backend debugging board and now uses `environment`, `service`, `route`, `method`, `status_family`, and `log_level`; it must stay focused on ingress HTTP behavior, route hotspots, outbound HTTP pressure, and logs
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
-  - worker dashboard is now a no-selector operator dashboard; service, environment, job-status, and job-name dimensions must be visible directly in panels instead of relying on template-variable state
-  - `worker-detail.json` is the dedicated single-worker debugging board; it may use only `service` then `environment` selectors, and its panels must answer which job types are slow or failing and what worker logs explain the issue
+  - `worker-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
+  - `worker-detail.json` is the backend worker debugging board and now uses `environment`, `service`, `job_name`, `job_status`, and `log_level`; it must stay focused on job throughput, job failure shape, slow job types, and logs
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
   - logs and traces drilldown dashboard is now a no-selector operational log board; service, environment, and level dimensions must be visible directly in panels instead of relying on template-variable state
   - do not reintroduce fragile dashboard-variable flows for service/environment unless there is a strong proven operator benefit and a live validation path
