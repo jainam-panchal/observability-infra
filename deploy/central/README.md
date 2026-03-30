@@ -30,6 +30,10 @@ The compose file mounts these repository-managed configuration paths:
 
 Those files and directories are created by later infra tasks. The compose file is defined first so the service topology and mount contract are fixed before backend-specific configuration is added.
 
+The central collector companion env file lives at:
+
+- `collector/central/.env.example`
+
 ## Exposed Ports
 
 - `4317` OTLP/gRPC receiver on the central collector

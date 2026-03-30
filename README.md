@@ -131,6 +131,10 @@ The local collector configuration lives at:
 
 - `collector/local/config.yaml`
 
+The central collector configuration lives at:
+
+- `collector/central/config.yaml`
+
 The high-level architecture overview lives at:
 
 - `docs/architecture-overview.md`
