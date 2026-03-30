@@ -127,7 +127,161 @@ flowchart LR
     PROM --> GRAF
 ```
 
-## 4. Core Design Decisions
+## 4. Service Catalog
+
+This section explains each service in the stack, why it is included, and what role it plays in the overall design.
+
+### 4.1 Local OpenTelemetry Collector
+
+What it is:
+
+- the telemetry agent that runs on each application EC2 host
+
+Why it is used:
+
+- gives application containers one local OTLP destination
+- collects host-visible Docker logs without requiring each application to know about Loki
+- batches, enriches, and forwards telemetry to the central stack
+- keeps application code decoupled from storage backends
+
+What it is responsible for:
+
+- receiving OTLP traces and metrics from local applications
+- reading Docker `json-file` logs from the host
+- adding host and environment metadata
+- retrying and forwarding telemetry upstream
+
+What it is not responsible for:
+
+- long-term telemetry storage
+- dashboards
+- alerting
+- direct user access
+
+### 4.2 Central OpenTelemetry Collector
+
+What it is:
+
+- the ingestion and routing gateway on the central observability host
+
+Why it is used:
+
+- centralizes routing logic between collectors and storage systems
+- keeps backend-specific exporters out of application hosts
+- provides one place to normalize how logs, traces, and metrics are fanned out
+
+What it is responsible for:
+
+- receiving OTLP from local collectors
+- exporting logs to Loki
+- exporting traces to Tempo
+- exposing metrics for Prometheus scraping
+
+What it is not responsible for:
+
+- storing telemetry itself
+- dashboard rendering
+- replacing Prometheus, Loki, or Tempo
+
+### 4.3 Prometheus
+
+What it is:
+
+- the metrics storage and query backend
+
+Why it is used:
+
+- it is the standard open-source time-series backend for infrastructure and application metrics
+- it supports PromQL, alert rules, and a well-understood operational model
+- it fits the scrape-based central collector design
+
+What it is responsible for:
+
+- scraping metrics from the central collector
+- storing metrics over time
+- evaluating alert rules
+- serving metrics queries to Grafana
+
+What it is not responsible for:
+
+- log storage
+- trace storage
+- receiving application traffic directly
+
+### 4.4 Loki
+
+What it is:
+
+- the log storage backend
+
+Why it is used:
+
+- it is built for indexed labels plus compressed log storage
+- it integrates naturally with Grafana
+- it fits structured application logs without needing a heavyweight full-text stack for this phase
+
+What it is responsible for:
+
+- storing structured logs
+- serving log queries to Grafana
+- supporting trace-to-log correlation through labels and fields such as `trace_id`
+
+What it is not responsible for:
+
+- metrics
+- traces
+- acting as the log collector itself
+
+### 4.5 Tempo
+
+What it is:
+
+- the trace storage backend
+
+Why it is used:
+
+- it is designed specifically for distributed traces
+- it integrates directly with Grafana for trace exploration
+- it pairs cleanly with OpenTelemetry and keeps trace storage separate from metrics and logs
+
+What it is responsible for:
+
+- storing spans and traces
+- serving trace lookups to Grafana
+- supporting cross-signal debugging when trace IDs are present in logs
+
+What it is not responsible for:
+
+- metrics
+- logs
+- generating spans on behalf of applications
+
+### 4.6 Grafana
+
+What it is:
+
+- the operator-facing visualization and exploration layer
+
+Why it is used:
+
+- it provides one UI for metrics, logs, and traces
+- it supports dashboards, Explore workflows, and datasource correlation
+- it is the standard front end for the Prometheus/Loki/Tempo stack
+
+What it is responsible for:
+
+- dashboards
+- ad hoc exploration
+- trace-to-log and metric-to-trace navigation
+- presenting data from Prometheus, Loki, and Tempo
+
+What it is not responsible for:
+
+- telemetry storage
+- telemetry collection
+- replacing alert evaluation in Prometheus
+
+## 5. Core Design Decisions
 
 ### 4.1 One Collector Per App Host
 
@@ -234,7 +388,7 @@ Why this decision:
 - centralization simplifies troubleshooting while the stack is still new to the team
 - the tradeoff is acceptable only if its single-point-of-failure status is explicit
 
-## 5. High-Level Flow
+## 6. High-Level Flow
 
 ### 5.1 Log Flow
 

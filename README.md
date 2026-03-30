@@ -41,6 +41,68 @@ The standard deployment model is:
 
 Application hosts forward telemetry to the central observability stack. Grafana serves as the operator-facing entry point for dashboards, logs, and traces.
 
+## Service Summary
+
+### Local OpenTelemetry Collector
+
+- runs on each application EC2 host
+- receives OTLP from applications
+- reads Docker `json-file` logs
+- forwards telemetry to the central stack
+
+Why it exists:
+
+- one local telemetry destination for all app containers
+- no direct application dependency on Loki, Tempo, or Prometheus
+
+### Central OpenTelemetry Collector
+
+- receives telemetry from local collectors
+- routes logs to Loki
+- routes traces to Tempo
+- exposes metrics for Prometheus scraping
+
+Why it exists:
+
+- central backend routing and normalization point
+- keeps backend-specific exporter logic out of app hosts
+
+### Prometheus
+
+- stores metrics
+- evaluates metric-based alerts
+- serves PromQL queries to Grafana
+
+Why it exists:
+
+- standard open-source metrics backend with scrape-based operation
+
+### Loki
+
+- stores logs
+- serves log queries to Grafana
+
+Why it exists:
+
+- efficient log backend for structured logs and Grafana correlation workflows
+
+### Tempo
+
+- stores traces
+- serves trace queries to Grafana
+
+Why it exists:
+
+- dedicated distributed-trace backend aligned with OpenTelemetry
+
+### Grafana
+
+- provides dashboards and exploration for logs, metrics, and traces
+
+Why it exists:
+
+- one operator-facing UI across all signals
+
 ## Design Principles
 
 - prefer standard open-source observability patterns
