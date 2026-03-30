@@ -186,6 +186,10 @@ The application integration contract should live in:
 
 - `docs/application-integration-contract.md`
 
+The deployment and validation runbook should live in:
+
+- `docs/deployment-validation-runbook.md`
+
 ## Success Criteria
 
 - telemetry from pilot Go services reaches Loki, Tempo, and Prometheus
