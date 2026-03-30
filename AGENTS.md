@@ -64,3 +64,4 @@ Checklist rule:
 - `GO-013` must be proved by a testing-specific smoke row that confirms the unit-test inventory is explicit and aligned; do not use the final quality gate row to prove test coverage exists
 - `deploy/central/docker-compose.yml` is the canonical central-stack topology file; backend-specific config tasks may add mounted files later, but they should not change the basic service boundary without an explicit architecture decision
 - service-facing docs should explain each platform component in plain operational terms: what it is, why it is used, what it is responsible for, and what it is not responsible for
+- `collector/local/config.yaml` is the canonical local collector behavior file; later deployment wrappers should mount it rather than duplicating receiver or pipeline logic elsewhere

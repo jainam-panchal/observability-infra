@@ -127,6 +127,10 @@ The central stack compose scaffold lives at:
 
 - `deploy/central/docker-compose.yml`
 
+The local collector configuration lives at:
+
+- `collector/local/config.yaml`
+
 The high-level architecture overview lives at:
 
 - `docs/architecture-overview.md`

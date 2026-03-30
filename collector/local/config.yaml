@@ -1,0 +1,95 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  filelog:
+    include:
+      - /var/lib/docker/containers/*/*-json.log
+    start_at: end
+    include_file_path: true
+    include_file_name: false
+    operators:
+      - id: container-json-parser
+        type: json_parser
+        timestamp:
+          parse_from: attributes.time
+          layout: "%Y-%m-%dT%H:%M:%S.%fZ"
+      - id: container-log-body
+        type: move
+        from: attributes.log
+        to: body
+      - id: container-id-extractor
+        type: regex_parser
+        parse_from: attributes["log.file.path"]
+        regex: '^/var/lib/docker/containers/(?P<container_id>[^/]+)/'
+      - id: container-id-resource
+        type: move
+        from: attributes.container_id
+        to: resource["container.id"]
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+    spike_limit_mib: 64
+
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: ${env:DEPLOYMENT_ENVIRONMENT}
+        action: upsert
+      - key: host.name
+        value: ${env:HOST_NAME}
+        action: upsert
+      - key: host.id
+        value: ${env:HOST_ID}
+        action: upsert
+      - key: cloud.provider
+        value: aws
+        action: upsert
+
+  batch:
+    send_batch_size: 1024
+    timeout: 5s
+
+exporters:
+  otlp:
+    endpoint: ${env:CENTRAL_OTLP_ENDPOINT}
+    tls:
+      insecure: ${env:CENTRAL_OTLP_INSECURE}
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - resource
+        - batch
+      exporters:
+        - otlp
+
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - resource
+        - batch
+      exporters:
+        - otlp
+
+    logs:
+      receivers:
+        - filelog
+      processors:
+        - memory_limiter
+        - resource
+        - batch
+      exporters:
+        - otlp
