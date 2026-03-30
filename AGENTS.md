@@ -69,3 +69,8 @@ Checklist rule:
 - `prometheus/prometheus.yml` and `prometheus/alert-rules.yml` are the canonical metrics and alerting entrypoints; early alert rules should stay intentionally narrow and aligned with the metric names emitted by `go-observability`
 - `grafana/provisioning/datasources/datasources.yml` is the canonical datasource definition; Grafana datasource setup should remain file-provisioned rather than UI-managed, and correlation settings should live there
 - dashboard JSON files under `grafana/dashboards/` are the canonical dashboard definitions; each dashboard task should produce a standalone JSON file and use its own smoke row rather than relying on the future full-render smoke
+- current dashboard metric contract to preserve unless the shared package changes:
+  - service dashboard uses `http_server_request_count`, `http_server_request_duration_bucket`, and `http_server_active_requests`
+  - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_bucket`
+  - current dashboard label keys are `service_name`, `deployment_environment`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`
+- if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
