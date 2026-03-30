@@ -56,6 +56,12 @@ Pass criteria:
 - Compose resolves without syntax errors
 - the collector image and env vars resolve correctly
 
+For repository-level definition validation, this also works with:
+
+```bash
+docker compose -f deploy/local/docker-compose.yml --env-file deploy/local/.env.example config
+```
+
 ## Start
 
 Run:

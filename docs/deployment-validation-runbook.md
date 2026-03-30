@@ -197,6 +197,12 @@ Validate the deployment wrapper before startup:
 docker compose -f deploy/local/docker-compose.yml --env-file deploy/local/.env config
 ```
 
+For repository definition validation without a host-specific `.env`, this may be checked with:
+
+```bash
+docker compose -f deploy/local/docker-compose.yml --env-file deploy/local/.env.example config
+```
+
 Then start it:
 
 ```bash

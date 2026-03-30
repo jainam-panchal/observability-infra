@@ -5,8 +5,12 @@ services:
     restart: unless-stopped
     command:
       - --config=/etc/otelcol-contrib/config.yaml
-    env_file:
-      - .env
+    environment:
+      CENTRAL_OTLP_ENDPOINT: ${CENTRAL_OTLP_ENDPOINT}
+      CENTRAL_OTLP_INSECURE: ${CENTRAL_OTLP_INSECURE}
+      DEPLOYMENT_ENVIRONMENT: ${DEPLOYMENT_ENVIRONMENT}
+      HOST_NAME: ${HOST_NAME}
+      HOST_ID: ${HOST_ID}
     ports:
       - "4317:4317"
       - "4318:4318"
