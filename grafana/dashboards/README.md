@@ -14,7 +14,9 @@ Dashboard JSON files are kept in the repository so that:
 ## Current Dashboards
 
 - `service-overview.json`
+- `service-detail.json`
 - `worker-overview.json`
+- `worker-detail.json`
 - `platform-health.json`
 - `logs-and-traces-drilldown.json`
 
