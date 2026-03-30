@@ -77,7 +77,9 @@ Checklist rule:
 - the central stack is currently pinned to `grafana/tempo:2.9.1`; do not upgrade Tempo casually because `2.10.x` enables Kafka-backed ingest modules in the default single-binary startup path and breaks this local-storage pilot stack
 - `prometheus/prometheus.yml` and `prometheus/alert-rules.yml` are the canonical metrics and alerting entrypoints; early alert rules should stay intentionally narrow and aligned with the metric names emitted by `go-observability`
 - `grafana/provisioning/datasources/datasources.yml` is the canonical datasource definition; Grafana datasource setup should remain file-provisioned rather than UI-managed, and correlation settings should live there
+- `grafana/provisioning/dashboards/dashboards.yml` is the canonical dashboard provider definition; dashboard JSON files under `grafana/dashboards/` must be file-provisioned into Grafana instead of relying on manual imports
 - dashboard JSON files under `grafana/dashboards/` are the canonical dashboard definitions; each dashboard task should produce a standalone JSON file and use its own smoke row rather than relying on the future full-render smoke
+- Prometheus must scrape both `otel-collector:8889` for exported application metrics and `otel-collector:8888` for collector self-metrics; the Platform Health dashboard depends on the self-scrape job `central-otel-collector-self`
 - `docs/deployment-validation-runbook.md` is the canonical operator runbook for bring-up and validation; runtime smoke rows should align to its procedures rather than inventing ad hoc validation steps elsewhere
 - current dashboard metric contract to preserve unless the shared package changes:
   - service dashboard uses `http_server_request_count`, `http_server_request_duration_bucket`, and `http_server_active_requests`

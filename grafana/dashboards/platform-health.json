@@ -55,7 +55,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job) (up{job=~\"central-otel-collector|prometheus\"})",
+          "expr": "sum by (job) (up{job=~\"central-otel-collector-self|prometheus\"})",
           "legendFormat": "{{job}}",
           "range": true,
           "refId": "A"
@@ -352,7 +352,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "process_resident_memory_bytes{job=~\"central-otel-collector|prometheus\"}",
+          "expr": "process_resident_memory_bytes{job=~\"central-otel-collector-self|prometheus\"}",
           "legendFormat": "{{job}} / {{instance}}",
           "range": true,
           "refId": "A"
@@ -396,7 +396,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(process_cpu_time_seconds_total{job=~\"central-otel-collector|prometheus\"}[5m])",
+          "expr": "rate(process_cpu_time_seconds_total{job=~\"central-otel-collector-self|prometheus\"}[5m])",
           "legendFormat": "{{job}} / {{instance}}",
           "range": true,
           "refId": "A"

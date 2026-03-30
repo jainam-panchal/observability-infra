@@ -157,6 +157,10 @@ The Grafana datasource provisioning lives at:
 
 - `grafana/provisioning/datasources/datasources.yml`
 
+The Grafana dashboard provider provisioning lives at:
+
+- `grafana/provisioning/dashboards/dashboards.yml`
+
 The Grafana dashboard JSON files live at:
 
 - `grafana/dashboards/`
