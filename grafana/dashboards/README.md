@@ -16,7 +16,7 @@ Dashboard JSON files are kept in the repository so that:
 - `service-overview.json`
 - `worker-overview.json`
 - `platform-health.json`
+- `logs-and-traces-drilldown.json`
 
 Future tasks will add:
-
-- `logs-and-traces-drilldown.json`
+ 

@@ -73,5 +73,6 @@ Checklist rule:
   - service dashboard uses `http_server_request_count`, `http_server_request_duration_bucket`, and `http_server_active_requests`
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_bucket`
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
+  - logs and traces drilldown dashboard depends on Loki log labels and fields carrying `service_name`, `deployment_environment`, `level`, and `trace_id`, plus the provisioned Tempo and Loki correlation settings
   - current dashboard label keys are `service_name`, `deployment_environment`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
