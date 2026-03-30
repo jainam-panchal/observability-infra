@@ -43,6 +43,14 @@ Checklist rule:
 - record important evolving implementation context in `AGENTS.md` whenever it will materially affect later work, validation, or integration expectations
 - when a checklist verification mapping is too coarse to prove one task honestly, split the smoke row before marking the task complete
 
+## Root Layout Rules
+
+- keep the repo root limited to repository entrypoint files such as `README.md`, `AGENTS.md`, and `.gitignore`
+- keep architecture and platform specifications under `docs/`
+- keep deployment assets under `deploy/`
+- keep execution tracking artifacts under `tracking/`
+- the canonical checklist path is `tracking/implementation-checklist.csv`
+
 ## Implementation Context
 
 - `go-observability` logger verification now has a dedicated smoke gate `SMK-GO-007`; cross-repo checklist updates should preserve that separation instead of bundling logger proof into broader Gin/http smoke rows
