@@ -67,3 +67,4 @@ Checklist rule:
 - `collector/local/config.yaml` is the canonical local collector behavior file; later deployment wrappers should mount it rather than duplicating receiver or pipeline logic elsewhere
 - `collector/central/config.yaml` is the canonical central collector behavior file; backend tasks should build around its routing contract instead of bypassing it with direct application-to-backend assumptions
 - `prometheus/prometheus.yml` and `prometheus/alert-rules.yml` are the canonical metrics and alerting entrypoints; early alert rules should stay intentionally narrow and aligned with the metric names emitted by `go-observability`
+- `grafana/provisioning/datasources/datasources.yml` is the canonical datasource definition; Grafana datasource setup should remain file-provisioned rather than UI-managed, and correlation settings should live there

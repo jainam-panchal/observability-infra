@@ -140,6 +140,10 @@ The Prometheus configuration lives at:
 - `prometheus/prometheus.yml`
 - `prometheus/alert-rules.yml`
 
+The Grafana datasource provisioning lives at:
+
+- `grafana/provisioning/datasources/datasources.yml`
+
 The high-level architecture overview lives at:
 
 - `docs/architecture-overview.md`
