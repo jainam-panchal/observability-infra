@@ -68,3 +68,4 @@ Checklist rule:
 - `collector/central/config.yaml` is the canonical central collector behavior file; backend tasks should build around its routing contract instead of bypassing it with direct application-to-backend assumptions
 - `prometheus/prometheus.yml` and `prometheus/alert-rules.yml` are the canonical metrics and alerting entrypoints; early alert rules should stay intentionally narrow and aligned with the metric names emitted by `go-observability`
 - `grafana/provisioning/datasources/datasources.yml` is the canonical datasource definition; Grafana datasource setup should remain file-provisioned rather than UI-managed, and correlation settings should live there
+- dashboard JSON files under `grafana/dashboards/` are the canonical dashboard definitions; each dashboard task should produce a standalone JSON file and use its own smoke row rather than relying on the future full-render smoke
