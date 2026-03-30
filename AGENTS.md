@@ -80,3 +80,4 @@ Checklist rule:
   - current dashboard label keys are `service_name`, `deployment_environment`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
 - current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented
+- current central runtime blocker: `deploy/central/docker-compose.yml` validates with `docker compose ... config`, but full bring-up is not yet trustworthy because repository-owned `loki/config.yaml` and `tempo/config.yaml` files are still missing
