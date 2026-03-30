@@ -82,11 +82,11 @@ Checklist rule:
 - Prometheus must scrape both `otel-collector:8889` for exported application metrics and `otel-collector:8888` for collector self-metrics; the Platform Health dashboard depends on the self-scrape job `central-otel-collector-self`
 - `docs/deployment-validation-runbook.md` is the canonical operator runbook for bring-up and validation; runtime smoke rows should align to its procedures rather than inventing ad hoc validation steps elsewhere
 - current dashboard metric contract to preserve unless the shared package changes:
-  - service dashboard uses `http_server_request_count`, `http_server_request_duration_bucket`, and `http_server_active_requests`
-  - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_bucket`
+  - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, and `http_server_active_requests`
+  - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
   - logs and traces drilldown dashboard depends on Loki log labels and fields carrying `service_name`, `deployment_environment`, `level`, and `trace_id`, plus the provisioned Tempo and Loki correlation settings
-  - current dashboard label keys are `service_name`, `deployment_environment`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`
+  - current Prometheus label keys for application metrics are `exported_job`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`; do not build service and worker dashboards around `service_name` unless the exporter contract changes
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
 - current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented
 - current central runtime baseline: central compose now depends on repository-owned `loki/config.yaml` and `tempo/config.yaml`; if backend ports, mounted paths, or collector exporter targets change, update all three in the same change set

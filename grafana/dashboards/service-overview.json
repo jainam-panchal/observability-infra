@@ -60,7 +60,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_request_count{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"}[5m]))",
+          "expr": "sum(rate(http_server_request_count_total{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"}[5m]))",
           "legendFormat": "requests/sec",
           "range": true,
           "refId": "A"
@@ -108,7 +108,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(http_server_request_count{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\",http_response_status_code=~\"5..\"}[5m])) / sum(rate(http_server_request_count{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"}[5m]))) * 100",
+          "expr": "(sum(rate(http_server_request_count_total{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\",http_response_status_code=~\"5..\"}[5m])) / sum(rate(http_server_request_count_total{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"}[5m]))) * 100",
           "legendFormat": "5xx %",
           "range": true,
           "refId": "A"
@@ -151,17 +151,17 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(http_server_request_duration_bucket{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"}[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"}[5m])))",
           "legendFormat": "p50",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_bucket{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"}[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"}[5m])))",
           "legendFormat": "p95",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_bucket{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"}[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"}[5m])))",
           "legendFormat": "p99",
           "refId": "C"
         }
@@ -221,7 +221,7 @@
       },
       "targets": [
         {
-          "expr": "sum(http_server_active_requests{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"})",
+          "expr": "sum(http_server_active_requests{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"})",
           "refId": "A"
         }
       ],
@@ -259,7 +259,7 @@
       },
       "targets": [
         {
-          "expr": "topk(10, sum by (http_route) (rate(http_server_request_count{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route!=\"\",http_route=~\"$route\"}[5m])))",
+          "expr": "topk(10, sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",instance=~\"$instance\",http_route!=\"\",http_route=~\"$route\"}[5m])))",
           "legendFormat": "{{http_route}}",
           "refId": "A"
         }
@@ -299,7 +299,7 @@
       },
       "targets": [
         {
-          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_bucket{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route!=\"\",http_route=~\"$route\"}[5m]))))",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",http_route!=\"\",http_route=~\"$route\"}[5m]))))",
           "legendFormat": "{{http_route}}",
           "refId": "A"
         }
@@ -344,7 +344,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (http_response_status_code) (rate(http_server_request_count{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\",http_route=~\"$route\"}[5m]))",
+          "expr": "sum by (http_response_status_code) (rate(http_server_request_count_total{exported_job=~\"$service\",instance=~\"$instance\",http_route=~\"$route\"}[5m]))",
           "legendFormat": "{{http_response_status_code}}",
           "refId": "A"
         }
@@ -405,7 +405,7 @@
       },
       "targets": [
         {
-          "expr": "process_uptime_seconds{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\"}",
+          "expr": "process_uptime_seconds{exported_job=~\"$service\",instance=~\"$instance\"}",
           "refId": "A"
         }
       ],
@@ -444,7 +444,7 @@
       },
       "targets": [
         {
-          "expr": "rate(process_cpu_time_seconds_total{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\"}[5m])",
+          "expr": "rate(process_cpu_time_seconds_total{exported_job=~\"$service\",instance=~\"$instance\"}[5m])",
           "legendFormat": "cpu",
           "refId": "A"
         }
@@ -485,7 +485,7 @@
       },
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{service_name=~\"$service\",deployment_environment=~\"$environment\",instance=~\"$instance\"}",
+          "expr": "process_resident_memory_bytes{exported_job=~\"$service\",instance=~\"$instance\"}",
           "legendFormat": "rss",
           "refId": "A"
         }
@@ -522,7 +522,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count, deployment_environment)",
+          "query": "label_values(deployment_environment)",
           "refId": "Prometheus-environment"
         },
         "refresh": 2,
@@ -547,7 +547,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count{deployment_environment=~\"$environment\"}, service_name)",
+          "query": "label_values(http_server_request_count_total, exported_job)",
           "refId": "Prometheus-service"
         },
         "refresh": 2,
@@ -572,7 +572,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count{deployment_environment=~\"$environment\",service_name=~\"$service\"}, instance)",
+          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, instance)",
           "refId": "Prometheus-instance"
         },
         "refresh": 2,
@@ -597,7 +597,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count{deployment_environment=~\"$environment\",service_name=~\"$service\"}, http_route)",
+          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, http_route)",
           "refId": "Prometheus-route"
         },
         "refresh": 2,
