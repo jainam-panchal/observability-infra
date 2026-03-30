@@ -51,3 +51,4 @@ Checklist rule:
 - `go-observability` GORM verification now has a dedicated smoke gate `SMK-GO-009`; preserve that separation instead of bundling it with future raw SQL helper verification
 - `go-observability` raw SQL verification remains on `SMK-GO-003`; it proves the secondary `database/sql` path without weakening the package rule that GORM is the primary database integration path
 - `go-observability` worker verification remains on `SMK-GO-004`; it proves root job spans, parent propagation, and worker metric emission for the shared helper
+- `SMK-DOC-001` is satisfied only when the package guide, platform integration contract, dashboard spec, and implementation checklist agree on env vars, smoke gates, and the current exported integration surface
