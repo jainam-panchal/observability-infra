@@ -63,6 +63,7 @@ Checklist rule:
 - example tasks must use dedicated smoke rows that prove the example compiles against the current package surface; do not reuse feature-level smoke rows to verify examples
 - `GO-013` must be proved by a testing-specific smoke row that confirms the unit-test inventory is explicit and aligned; do not use the final quality gate row to prove test coverage exists
 - `deploy/central/docker-compose.yml` is the canonical central-stack topology file; backend-specific config tasks may add mounted files later, but they should not change the basic service boundary without an explicit architecture decision
+- `deploy/local/docker-compose.yml` is the canonical local collector deployment wrapper; local-host deployment changes should be made there rather than duplicating ad hoc per-host compose definitions elsewhere
 - service-facing docs should explain each platform component in plain operational terms: what it is, why it is used, what it is responsible for, and what it is not responsible for
 - `collector/local/config.yaml` is the canonical local collector behavior file; later deployment wrappers should mount it rather than duplicating receiver or pipeline logic elsewhere
 - `collector/central/config.yaml` is the canonical central collector behavior file; backend tasks should build around its routing contract instead of bypassing it with direct application-to-backend assumptions
@@ -77,4 +78,4 @@ Checklist rule:
   - logs and traces drilldown dashboard depends on Loki log labels and fields carrying `service_name`, `deployment_environment`, `level`, and `trace_id`, plus the provisioned Tempo and Loki correlation settings
   - current dashboard label keys are `service_name`, `deployment_environment`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
-- current known operational gap to preserve in docs and runbooks: the local collector deployment wrapper under `deploy/local/` does not exist yet, so local deployment remains a documented manual contract rather than a repository-owned runnable wrapper
+- current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented

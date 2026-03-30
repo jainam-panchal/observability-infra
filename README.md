@@ -127,6 +127,10 @@ The central stack compose scaffold lives at:
 
 - `deploy/central/docker-compose.yml`
 
+The local collector deployment wrapper lives at:
+
+- `deploy/local/docker-compose.yml`
+
 The local collector configuration lives at:
 
 - `collector/local/config.yaml`

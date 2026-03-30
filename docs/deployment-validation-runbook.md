@@ -31,7 +31,6 @@ This runbook covers:
 
 This runbook does not yet provide:
 
-- a finalized `deploy/local/` wrapper for the host-local collector
 - an environment-specific automation script for EC2 provisioning
 - a fully automated end-to-end test harness
 
@@ -164,11 +163,18 @@ Pass criteria:
 - each endpoint responds successfully
 - no container is in a restart loop
 
-## 6. Local Collector Deployment Expectations
+## 6. Local Collector Deployment
 
-The local collector is required for the architecture to function correctly, but this repository does not yet contain a finalized `deploy/local/` wrapper.
+The local collector deployment wrapper now lives in:
 
-Current operator expectation:
+- `deploy/local/docker-compose.yml`
+
+Use it on each application EC2 host together with:
+
+- `deploy/local/.env`
+- `collector/local/config.yaml`
+
+Operator expectation:
 
 - run one local collector per application EC2 host
 - mount the canonical config from `collector/local/config.yaml`
@@ -177,8 +183,6 @@ Current operator expectation:
 - provide environment values required by the local collector config
 - point the collector at the central collector OTLP endpoint
 
-Until `deploy/local/` exists, validate the host-local deployment manually against those requirements.
-
 Minimum local deployment contract:
 
 - OTLP receive enabled for applications
@@ -186,6 +190,18 @@ Minimum local deployment contract:
 - resource enrichment applied
 - batching and memory limiting enabled
 - OTLP export to central collector configured
+
+Validate the deployment wrapper before startup:
+
+```bash
+docker compose -f deploy/local/docker-compose.yml --env-file deploy/local/.env config
+```
+
+Then start it:
+
+```bash
+docker compose -f deploy/local/docker-compose.yml --env-file deploy/local/.env up -d
+```
 
 ## 7. Generic Application Validation Contract
 
@@ -455,7 +471,6 @@ Do not mark runtime validation tasks complete without recorded evidence.
 
 ## 12. Current Known Gaps
 
-- `deploy/local/` does not yet exist as a first-class deployment wrapper
 - end-to-end runtime validation has not yet been recorded in this repository
 - host-level metrics for central EC2 CPU, memory, and disk are not yet wired
 - Loki and Tempo internal health panels are deferred until backend self-metrics are explicitly enabled
