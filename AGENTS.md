@@ -49,3 +49,4 @@ Checklist rule:
 - `go-observability` Gin middleware verification now has a dedicated smoke gate `SMK-GO-008`; cross-repo checklist updates should preserve inbound middleware proof separately from outbound HTTP instrumentation
 - `go-observability` outbound HTTP verification remains on `SMK-GO-002`; it now proves `traceparent` injection and client child-span creation independently of inbound Gin middleware behavior
 - `go-observability` GORM verification now has a dedicated smoke gate `SMK-GO-009`; preserve that separation instead of bundling it with future raw SQL helper verification
+- `go-observability` worker verification remains on `SMK-GO-004`; it proves root job spans, parent propagation, and worker metric emission for the shared helper
