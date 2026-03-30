@@ -135,6 +135,11 @@ The central collector configuration lives at:
 
 - `collector/central/config.yaml`
 
+The Prometheus configuration lives at:
+
+- `prometheus/prometheus.yml`
+- `prometheus/alert-rules.yml`
+
 The high-level architecture overview lives at:
 
 - `docs/architecture-overview.md`
