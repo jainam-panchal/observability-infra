@@ -36,6 +36,24 @@ This runbook does not yet provide:
 
 Those are still future work items. The runbook documents the manual validation path until those assets exist.
 
+## Validation Evidence
+
+The current repository validation baseline has been exercised with synthetic non-production telemetry:
+
+- central stack started successfully from `deploy/central/docker-compose.yml`
+- local collector behavior was exercised with a one-off local collector container using `collector/local/config.yaml`
+- synthetic traces were sent with `telemetrygen traces`
+- synthetic metrics were sent with `telemetrygen metrics`
+- synthetic OTLP logs were sent with `telemetrygen logs`
+- traces were confirmed in Tempo search
+- metrics were confirmed in Prometheus
+- logs were confirmed in Loki query results
+- Grafana datasources and provisioned dashboards were confirmed through the Grafana API
+
+This proves the platform path end to end without depending on one specific application repository.
+
+Application-specific API and worker validation is still tracked separately in the cross-repo rollout checklist items.
+
 ## 3. Repository Inputs
 
 Use these files as the canonical inputs during deployment and validation:

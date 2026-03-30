@@ -207,6 +207,10 @@ The deployment and validation runbook should live in:
 
 - `docs/deployment-validation-runbook.md`
 
+The generic rollout checklist should live in:
+
+- `docs/generic-rollout-checklist.md`
+
 ## Success Criteria
 
 - telemetry from pilot Go services reaches Loki, Tempo, and Prometheus
