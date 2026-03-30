@@ -40,3 +40,9 @@ Required smoke areas:
 Checklist rule:
 
 - do not mark an infra task `verified` until the referenced smoke row has passed and the result is recorded
+- record important evolving implementation context in `AGENTS.md` whenever it will materially affect later work, validation, or integration expectations
+- when a checklist verification mapping is too coarse to prove one task honestly, split the smoke row before marking the task complete
+
+## Implementation Context
+
+- `go-observability` logger verification now has a dedicated smoke gate `SMK-GO-007`; cross-repo checklist updates should preserve that separation instead of bundling logger proof into broader Gin/http smoke rows
