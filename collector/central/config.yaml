@@ -36,6 +36,8 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
     metric_expiration: 5m
+    resource_to_telemetry_conversion:
+      enabled: true
 
   loki:
     endpoint: ${env:LOKI_PUSH_ENDPOINT}

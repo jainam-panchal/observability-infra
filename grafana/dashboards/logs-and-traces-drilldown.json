@@ -70,7 +70,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=~\".+\"}[15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[15m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -127,7 +127,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({level=\"ERROR\"}[15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"}[15m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -184,12 +184,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=\"e2e-api\"}[15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\"} |= \"trace_id\" [15m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "API Logs Last 15m",
+      "title": "Logs With Trace IDs Last 15m",
       "type": "stat"
     },
     {
@@ -241,12 +241,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=~\".*worker.*\"}[15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"} |= \"trace_id\" [15m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Worker Logs Last 15m",
+      "title": "Error Logs With Trace IDs Last 15m",
       "type": "stat"
     },
     {
@@ -285,7 +285,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (service_name) (count_over_time({service_name=~\".+\"}[5m]))",
+          "expr": "sum by (service_name) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[5m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -329,12 +329,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment) (count_over_time({service_name=~\".+\"}[5m]))",
+          "expr": "sum by (level) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[5m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log Volume By Environment",
+      "title": "Log Volume By Level",
       "type": "timeseries"
     },
     {
@@ -373,12 +373,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({service_name=~\".+\"}[5m]))",
+          "expr": "sum by (deployment_environment) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[5m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log Volume By Level",
+      "title": "Log Volume By Environment",
       "type": "timeseries"
     },
     {
@@ -405,12 +405,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=\"e2e-api\"}",
+          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Recent API Logs",
+      "title": "Recent Logs",
       "type": "logs"
     },
     {
@@ -437,39 +437,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\".*worker.*\"}",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Recent Worker Logs",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 23
-      },
-      "id": 10,
-      "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "{level=\"ERROR\"}",
+          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -487,7 +455,82 @@
     "backend"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({service_name=~\".+\"}, deployment_environment)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Environment",
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": {
+          "query": "label_values({service_name=~\".+\"}, deployment_environment)",
+          "refId": "LokiVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({deployment_environment=~\"$environment\"}, service_name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Service",
+        "multi": false,
+        "name": "service",
+        "options": [],
+        "query": {
+          "query": "label_values({deployment_environment=~\"$environment\"}, service_name)",
+          "refId": "LokiVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "definition": ".*,INFO,ERROR",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Level",
+        "multi": false,
+        "name": "level",
+        "options": [],
+        "query": ".*,INFO,ERROR",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "custom"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
@@ -497,6 +540,6 @@
   "timezone": "",
   "title": "Logs And Traces Drilldown",
   "uid": "logs-and-traces-drilldown",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

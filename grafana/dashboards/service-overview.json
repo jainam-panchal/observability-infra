@@ -70,8 +70,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total[15m]))",
-          "legendFormat": "requests",
+          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[15m]))",
           "range": true,
           "refId": "A"
         }
@@ -133,8 +132,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum(increase(http_server_request_count_total{http_response_status_code=~\"5..\"}[15m])) / clamp_min(sum(increase(http_server_request_count_total[15m])), 1)) * 100",
-          "legendFormat": "5xx %",
+          "expr": "(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[15m])) / clamp_min(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[15m])), 1)) * 100",
           "range": true,
           "refId": "A"
         }
@@ -196,8 +194,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket[15m])))",
-          "legendFormat": "p95",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[15m])))",
           "range": true,
           "refId": "A"
         }
@@ -223,7 +220,7 @@
               },
               {
                 "color": "orange",
-                "value": 20
+                "value": 10
               }
             ]
           },
@@ -254,8 +251,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(http_server_active_requests)",
-          "legendFormat": "active",
+          "expr": "sum(http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
           "range": true,
           "refId": "A"
         }
@@ -300,7 +296,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (exported_job) (rate(http_server_request_count_total[5m]))",
+          "expr": "sum by (exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[5m]))",
           "legendFormat": "{{exported_job}}",
           "range": true,
           "refId": "A"
@@ -346,7 +342,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * sum by (exported_job) (rate(http_server_request_count_total{http_response_status_code=~\"5..\"}[5m])) / clamp_min(sum by (exported_job) (rate(http_server_request_count_total[5m])), 0.0001)",
+          "expr": "100 * sum by (exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[5m])) / clamp_min(sum by (exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[5m])), 0.0001)",
           "legendFormat": "{{exported_job}}",
           "range": true,
           "refId": "A"
@@ -364,65 +360,18 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          },
-          "unit": "s"
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
         "y": 13
       },
       "id": 7,
       "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (exported_job, le) (rate(http_server_request_duration_seconds_bucket[5m])))",
-          "legendFormat": "{{exported_job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "P95 Latency By Service",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 13
-      },
-      "id": 8,
-      "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
         "reduceOptions": {
@@ -437,94 +386,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment) (increase(http_server_request_count_total[15m]))",
-          "legendFormat": "{{deployment_environment}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Request Volume By Environment",
-      "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 13
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (http_response_status_code) (rate(http_server_request_count_total[5m]))",
-          "legendFormat": "{{http_response_status_code}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Status Code Mix",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 21
-      },
-      "id": 10,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total[15m])))",
+          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[15m])))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
@@ -548,12 +410,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 12,
-        "y": 21
+        "y": 13
       },
-      "id": 11,
+      "id": 8,
       "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
@@ -569,7 +431,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket[15m]))))",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[15m]))))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
@@ -587,9 +449,9 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 21
       },
-      "id": 12,
+      "id": 9,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -602,7 +464,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\".+\", level=\"ERROR\"}",
+          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -620,7 +482,64 @@
     "backend"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(http_server_request_count_total, deployment_environment_name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Environment",
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(http_server_request_count_total, deployment_environment_name)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Service",
+        "multi": false,
+        "name": "service",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
@@ -630,6 +549,6 @@
   "timezone": "",
   "title": "Service Overview",
   "uid": "service-overview",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

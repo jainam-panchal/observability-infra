@@ -70,7 +70,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[15m]))",
+          "expr": "sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\",http_response_status_code=~\"$status_family\"}[15m]))",
           "range": true,
           "refId": "A"
         }
@@ -132,7 +132,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\",http_response_status_code=~\"5..\"}[15m])) / clamp_min(sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[15m])), 1)) * 100",
+          "expr": "(sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\",http_response_status_code=~\"5..\"}[15m])) / clamp_min(sum(increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"}[15m])), 1)) * 100",
           "range": true,
           "refId": "A"
         }
@@ -194,7 +194,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[15m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"}[15m])))",
           "range": true,
           "refId": "A"
         }
@@ -251,7 +251,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(http_server_active_requests{exported_job=~\"$service\",deployment_environment=~\"$environment\"})",
+          "expr": "sum(http_server_active_requests{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"})",
           "range": true,
           "refId": "A"
         }
@@ -296,7 +296,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[5m]))",
+          "expr": "sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_response_status_code=~\"$status_family\"}[5m]))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
@@ -342,13 +342,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\",http_response_status_code=~\"5..\"}[5m])) / clamp_min(sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[5m])), 0.0001)",
+          "expr": "100 * sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_response_status_code=~\"$status_family\"}[5m])) / clamp_min(sum by (http_route) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}[5m])), 0.0001)",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "5xx Rate By Route",
+      "title": "Status Pressure By Route",
       "type": "timeseries"
     },
     {
@@ -388,13 +388,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (http_response_status_code) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[5m]))",
+          "expr": "sum by (http_response_status_code) (rate(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_route=~\"$route\"}[5m]))",
           "legendFormat": "{{http_response_status_code}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Code Mix",
+      "title": "Status Code Mix For Selected Route",
       "type": "timeseries"
     },
     {
@@ -433,7 +433,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",deployment_environment=~\"$environment\"}[15m]))))",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (http_route, le) (rate(http_server_request_duration_seconds_bucket{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}[15m]))))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
@@ -477,7 +477,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment=~\"$environment\",http_response_status_code=~\"5..\"}[15m])))",
+          "expr": "topk(10, sum by (http_route) (increase(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[15m])))",
           "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
@@ -522,7 +522,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({service_name=~\"$service\",deployment_environment=~\"$environment\"}[5m]))",
+          "expr": "sum by (level) (count_over_time({service_name=~\"$service\",deployment_environment=~\"$environment\",level=~\"$log_level\"}[5m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -586,7 +586,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\"$service\",deployment_environment=~\"$environment\"}",
+          "expr": "{service_name=~\"$service\",deployment_environment=~\"$environment\",level=~\"$log_level\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -643,7 +643,7 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, deployment_environment)",
+        "definition": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, deployment_environment_name)",
         "hide": 0,
         "includeAll": false,
         "label": "Environment",
@@ -652,13 +652,81 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, deployment_environment)",
+          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\"}, deployment_environment_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "skipUrlSync": true,
         "sort": 1,
         "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}, http_route)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Route",
+        "multi": false,
+        "name": "route",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(http_server_request_count_total{exported_job=~\"$service\",deployment_environment_name=~\"$environment\"}, http_route)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "definition": "All : .*, 2xx : 2.., 4xx : 4.., 5xx : 5..",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Status Family",
+        "multi": false,
+        "name": "status_family",
+        "options": [],
+        "query": ".* ,2..,4..,5..",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "definition": "All : .*, INFO : INFO, ERROR : ERROR",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Log Level",
+        "multi": false,
+        "name": "log_level",
+        "options": [],
+        "query": ".*,INFO,ERROR",
+        "refresh": 1,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "custom"
       }
     ]
   },
