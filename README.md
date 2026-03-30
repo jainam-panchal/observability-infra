@@ -94,6 +94,7 @@ Why it exists:
 Why it exists:
 
 - dedicated distributed-trace backend aligned with OpenTelemetry
+- pinned to `grafana/tempo:2.9.1` for this stack because Tempo `2.10.x` defaults introduce Kafka-backed ingest behavior that is incompatible with the current simple single-node local-storage deployment
 
 ### Grafana
 
@@ -143,6 +144,14 @@ The Prometheus configuration lives at:
 
 - `prometheus/prometheus.yml`
 - `prometheus/alert-rules.yml`
+
+The Loki configuration lives at:
+
+- `loki/config.yaml`
+
+The Tempo configuration lives at:
+
+- `tempo/config.yaml`
 
 The Grafana datasource provisioning lives at:
 

@@ -1,3 +1,7 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
 receivers:
   otlp:
     protocols:
@@ -63,6 +67,9 @@ exporters:
       insecure: ${env:CENTRAL_OTLP_INSECURE}
 
 service:
+  extensions:
+    - health_check
+
   pipelines:
     traces:
       receivers:

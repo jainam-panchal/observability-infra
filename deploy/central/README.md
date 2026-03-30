@@ -34,18 +34,26 @@ The central collector companion env file lives at:
 
 - `collector/central/.env.example`
 
+The central stack environment must also provide:
+
+- `LOKI_PUSH_ENDPOINT`
+- `TEMPO_OTLP_ENDPOINT`
+- `TEMPO_OTLP_INSECURE`
+
 ## Exposed Ports
 
 - `4317` OTLP/gRPC receiver on the central collector
 - `4318` OTLP/HTTP receiver on the central collector
+- `13133` collector health endpoint
 - `8889` Prometheus scrape endpoint exposed by the central collector
 - `9090` Prometheus
 - `3100` Loki
 - `3200` Tempo
-- `3000` Grafana
+- `3300` Grafana host access mapped to container port `3000`
 
 ## Notes
 
 - this stack is intentionally single-node for the pilot
 - volume-backed persistence is defined for Prometheus, Loki, Tempo, and Grafana
+- Tempo is pinned to `grafana/tempo:2.9.1` in `.env.example` because the current `2.10.x` default single-binary startup path enables Kafka-backed ingest modules that break this simple local-storage pilot stack
 - service image tags should be pinned through `.env` before production deployment

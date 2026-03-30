@@ -617,7 +617,7 @@ The main internal ports are:
 - `9090` for Prometheus
 - `3100` for Loki
 - `3200` for Tempo
-- `3000` for Grafana
+- `3300` host access for Grafana mapped to container port `3000`
 
 Grafana should be authenticated and not left open publicly without access controls.
 

@@ -73,7 +73,7 @@ Expected core ports:
 
 - `4317` OTLP gRPC
 - `4318` OTLP HTTP
-- `3000` Grafana
+- `3300` Grafana host access mapped to container port `3000`
 - `3100` Loki
 - `3200` Tempo
 - `9090` Prometheus
@@ -155,7 +155,7 @@ curl -fsS http://localhost:9090/-/ready
 Check Grafana:
 
 ```bash
-curl -fsS http://localhost:3000/api/health
+curl -fsS http://localhost:3300/api/health
 ```
 
 Pass criteria:

@@ -64,10 +64,17 @@ Checklist rule:
 - `GO-013` must be proved by a testing-specific smoke row that confirms the unit-test inventory is explicit and aligned; do not use the final quality gate row to prove test coverage exists
 - `deploy/central/docker-compose.yml` is the canonical central-stack topology file; backend-specific config tasks may add mounted files later, but they should not change the basic service boundary without an explicit architecture decision
 - `deploy/local/docker-compose.yml` is the canonical local collector deployment wrapper; local-host deployment changes should be made there rather than duplicating ad hoc per-host compose definitions elsewhere
+- `collector/local/config.yaml` must keep the `health_check` extension enabled because `deploy/local/docker-compose.yml` publishes port `13133` for host-side smoke validation
 - `deploy/local/docker-compose.yml` must validate with `docker compose ... --env-file deploy/local/.env.example config`; do not require an undeclared extra `env_file` dependency that breaks repository-level wrapper validation
+- `deploy/central/docker-compose.yml` must pass the central collector exporter environment explicitly (`LOKI_PUSH_ENDPOINT`, `TEMPO_OTLP_ENDPOINT`, `TEMPO_OTLP_INSECURE`); do not rely on undocumented host environment leakage
+- `deploy/central/docker-compose.yml` must publish collector health on `13133` because the runbook and smoke checks rely on a host-visible readiness probe for the central collector
+- `deploy/central/docker-compose.yml` must publish Grafana on host port `3300`; keep docs, runbook commands, and operator guidance aligned to `http://localhost:3300`
 - service-facing docs should explain each platform component in plain operational terms: what it is, why it is used, what it is responsible for, and what it is not responsible for
 - `collector/local/config.yaml` is the canonical local collector behavior file; later deployment wrappers should mount it rather than duplicating receiver or pipeline logic elsewhere
 - `collector/central/config.yaml` is the canonical central collector behavior file; backend tasks should build around its routing contract instead of bypassing it with direct application-to-backend assumptions
+- `loki/config.yaml` is the canonical single-node Loki configuration for the current stack; central deployment changes must keep the collector push endpoint and mounted path `/etc/loki/local-config.yaml` aligned with it
+- `tempo/config.yaml` is the canonical single-node Tempo configuration for the current stack; central deployment changes must keep the collector OTLP exporter endpoint and mounted path `/etc/tempo.yaml` aligned with it
+- the central stack is currently pinned to `grafana/tempo:2.9.1`; do not upgrade Tempo casually because `2.10.x` enables Kafka-backed ingest modules in the default single-binary startup path and breaks this local-storage pilot stack
 - `prometheus/prometheus.yml` and `prometheus/alert-rules.yml` are the canonical metrics and alerting entrypoints; early alert rules should stay intentionally narrow and aligned with the metric names emitted by `go-observability`
 - `grafana/provisioning/datasources/datasources.yml` is the canonical datasource definition; Grafana datasource setup should remain file-provisioned rather than UI-managed, and correlation settings should live there
 - dashboard JSON files under `grafana/dashboards/` are the canonical dashboard definitions; each dashboard task should produce a standalone JSON file and use its own smoke row rather than relying on the future full-render smoke
@@ -80,4 +87,4 @@ Checklist rule:
   - current dashboard label keys are `service_name`, `deployment_environment`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
 - current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented
-- current central runtime blocker: `deploy/central/docker-compose.yml` validates with `docker compose ... config`, but full bring-up is not yet trustworthy because repository-owned `loki/config.yaml` and `tempo/config.yaml` files are still missing
+- current central runtime baseline: central compose now depends on repository-owned `loki/config.yaml` and `tempo/config.yaml`; if backend ports, mounted paths, or collector exporter targets change, update all three in the same change set

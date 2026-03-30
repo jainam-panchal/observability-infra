@@ -5,10 +5,15 @@ services:
     restart: unless-stopped
     command:
       - --config=/etc/otelcol-contrib/config.yaml
+    environment:
+      LOKI_PUSH_ENDPOINT: ${LOKI_PUSH_ENDPOINT:-http://loki:3100/loki/api/v1/push}
+      TEMPO_OTLP_ENDPOINT: ${TEMPO_OTLP_ENDPOINT:-tempo:4317}
+      TEMPO_OTLP_INSECURE: ${TEMPO_OTLP_INSECURE:-true}
     ports:
       - "4317:4317"
       - "4318:4318"
       - "8889:8889"
+      - "13133:13133"
     volumes:
       - ../../collector/central/config.yaml:/etc/otelcol-contrib/config.yaml:ro
     depends_on:
@@ -40,11 +45,11 @@ services:
     container_name: observability-loki
     restart: unless-stopped
     command:
-      - -config.file=/etc/loki/config.yaml
+      - -config.file=/etc/loki/local-config.yaml
     ports:
       - "3100:3100"
     volumes:
-      - ../../loki/config.yaml:/etc/loki/config.yaml:ro
+      - ../../loki/config.yaml:/etc/loki/local-config.yaml:ro
       - loki-data:/loki
     networks:
       - observability
@@ -54,11 +59,11 @@ services:
     container_name: observability-tempo
     restart: unless-stopped
     command:
-      - -config.file=/etc/tempo/config.yaml
+      - -config.file=/etc/tempo.yaml
     ports:
       - "3200:3200"
     volumes:
-      - ../../tempo/config.yaml:/etc/tempo/config.yaml:ro
+      - ../../tempo/config.yaml:/etc/tempo.yaml:ro
       - tempo-data:/var/tempo
     networks:
       - observability
@@ -68,7 +73,7 @@ services:
     container_name: observability-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3300:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
