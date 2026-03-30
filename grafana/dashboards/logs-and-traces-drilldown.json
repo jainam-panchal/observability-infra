@@ -22,19 +22,61 @@
   "links": [],
   "panels": [
     {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 7,
-        "w": 24,
+        "h": 5,
+        "w": 6,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
-        "content": "This dashboard is the operational bridge between metrics spikes, trace context, and raw logs. Use the `service`, `environment`, `level`, and optional `trace_id` filters to narrow logs first. For deep trace inspection, open Grafana Explore with the Tempo datasource and then pivot back into Loki using the provisioned trace-to-logs correlation. Direct trace search panels are intentionally deferred because the Explore workflow is more stable than embedding brittle Tempo-search panel JSON at this stage.",
-        "mode": "markdown"
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
       },
-      "title": "How To Use This Dashboard",
-      "type": "text"
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service_name=~\".+\"}[15m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log Lines Last 15m",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -44,40 +86,54 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          }
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 7
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 0
       },
       "id": 2,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
+        "textMode": "value_and_name"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (service_name) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$environment\"} | json | level=~\"$level\" [5m]))",
-          "legendFormat": "{{service_name}}",
+          "expr": "sum(count_over_time({level=\"ERROR\"}[15m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs by Service",
-      "type": "timeseries"
+      "title": "Error Logs Last 15m",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -87,40 +143,54 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          }
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 5,
+        "w": 6,
         "x": 12,
-        "y": 7
+        "y": 0
       },
       "id": 3,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
+        "textMode": "value_and_name"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$environment\"} | json | level=~\"$level\" [5m]))",
-          "legendFormat": "{{level}}",
+          "expr": "sum(count_over_time({service_name=\"e2e-api\"}[15m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs by Severity",
-      "type": "timeseries"
+      "title": "API Logs Last 15m",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -130,39 +200,97 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          }
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 15
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
       },
       "id": 4,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service_name=~\".*worker.*\"}[15m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Worker Logs Last 15m",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (service_name) (count_over_time({service_name=~\"$service\", deployment_environment=~\"$environment\"} | json | level=\"error\" [5m]))",
-          "legendFormat": "{{service_name}}",
+          "expr": "sum by (service_name) (count_over_time({service_name=~\".+\"}[5m]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Error Log Volume Over Time",
+      "title": "Log Volume By Service",
       "type": "timeseries"
     },
     {
@@ -180,30 +308,109 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 15
+        "w": 8,
+        "x": 8,
+        "y": 5
       },
-      "id": 5,
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (deployment_environment) (count_over_time({service_name=~\".+\"}[5m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log Volume By Environment",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 5
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (level) (count_over_time({service_name=~\".+\"}[5m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log Volume By Level",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "id": 8,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
-        "prettifyLogMessage": false,
+        "prettifyLogMessage": true,
         "showCommonLabels": false,
         "showLabels": true,
-        "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\"$service\", deployment_environment=~\"$environment\"} | json | level=~\"$level\"",
+          "expr": "{service_name=\"e2e-api\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs by Service and Severity",
+      "title": "Recent API Logs",
       "type": "logs"
     },
     {
@@ -211,194 +418,76 @@
         "type": "loki",
         "uid": "loki"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "id": 9,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{service_name=~\".*worker.*\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Worker Logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 24,
         "x": 0,
         "y": 23
       },
-      "id": 6,
+      "id": 10,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
-        "prettifyLogMessage": false,
+        "prettifyLogMessage": true,
         "showCommonLabels": false,
         "showLabels": true,
-        "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{service_name=~\"$service\", deployment_environment=~\"$environment\"} | json | trace_id=~\"$trace_id\"",
+          "expr": "{level=\"ERROR\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs by Trace ID",
+      "title": "Recent Error Logs",
       "type": "logs"
-    },
-    {
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 31
-      },
-      "id": 7,
-      "options": {
-        "content": "Slow trace workflow:\n\n1. Start from the Service Overview or Worker Overview dashboard.\n2. Identify the time window and service with elevated latency.\n3. Open Grafana Explore with the Tempo datasource.\n4. Search for traces in the same time window, filtered by service, and sort by duration.\n5. Open an individual trace and use the provisioned trace-to-logs pivot to inspect matching Loki records.\n\nRecommended Tempo search filters:\n\n- API latency: `service.name = \\\"<service>\\\"`\n- Worker failures: `service.name = \\\"<service>\\\" && status = error`\n- Duration drilldown: add a duration threshold in Explore when searching.",
-        "mode": "markdown"
-      },
-      "title": "Slow Trace Drilldown Workflow",
-      "type": "text"
-    },
-    {
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 31
-      },
-      "id": 8,
-      "options": {
-        "content": "Trace and worker failure workflow:\n\n1. If you already have a `trace_id`, set the dashboard variable and inspect the `Logs by Trace ID` panel.\n2. If the log line includes `trace_id`, use Loki derived fields to jump into Tempo.\n3. From the Tempo trace view, use the configured trace-to-logs correlation to jump back into Loki.\n4. For worker failures, filter logs by worker service and `level=error`, then use `job_name`, `job.status`, and `trace_id` fields to isolate the failing execution.\n\nThis dashboard intentionally relies on Grafana Explore for the actual Tempo search UI because that workflow is more stable than embedding brittle trace-search panels in JSON.",
-        "mode": "markdown"
-      },
-      "title": "Trace And Log Correlation Workflow",
-      "type": "text"
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "schemaVersion": 39,
   "style": "dark",
   "tags": [
     "observability",
     "logs",
-    "traces"
+    "backend"
   ],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(process_uptime_seconds, deployment_environment)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Environment",
-        "multi": true,
-        "name": "environment",
-        "options": [],
-        "query": {
-          "query": "label_values(process_uptime_seconds, deployment_environment)",
-          "refId": "Prometheus-environment"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(process_uptime_seconds{deployment_environment=~\"$environment\"}, service_name)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Service",
-        "multi": true,
-        "name": "service",
-        "options": [],
-        "query": {
-          "query": "label_values(process_uptime_seconds{deployment_environment=~\"$environment\"}, service_name)",
-          "refId": "Prometheus-service"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "hide": 0,
-        "includeAll": true,
-        "label": "Level",
-        "multi": true,
-        "name": "level",
-        "options": [
-          {
-            "selected": true,
-            "text": ".*",
-            "value": ".*"
-          },
-          {
-            "selected": false,
-            "text": "debug",
-            "value": "debug"
-          },
-          {
-            "selected": false,
-            "text": "info",
-            "value": "info"
-          },
-          {
-            "selected": false,
-            "text": "warn",
-            "value": "warn"
-          },
-          {
-            "selected": false,
-            "text": "error",
-            "value": "error"
-          }
-        ],
-        "query": ".*,debug,info,warn,error",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "",
-          "value": ""
-        },
-        "hide": 0,
-        "label": "Trace ID",
-        "name": "trace_id",
-        "options": [],
-        "query": "",
-        "skipUrlSync": false,
-        "type": "textbox"
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-6h",

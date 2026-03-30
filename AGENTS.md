@@ -83,10 +83,14 @@ Checklist rule:
 - `docs/deployment-validation-runbook.md` is the canonical operator runbook for bring-up and validation; runtime smoke rows should align to its procedures rather than inventing ad hoc validation steps elsewhere
 - current dashboard metric contract to preserve unless the shared package changes:
   - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, and `http_server_active_requests`
+  - service dashboard is now a no-selector operator dashboard; service, environment, status-code, and route dimensions must be visible directly in panels instead of relying on template-variable state
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
+  - worker dashboard is now a no-selector operator dashboard; service, environment, job-status, and job-name dimensions must be visible directly in panels instead of relying on template-variable state
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
-  - logs and traces drilldown dashboard depends on Loki log labels and fields carrying `service_name`, `deployment_environment`, `level`, and `trace_id`, plus the provisioned Tempo and Loki correlation settings
-  - current Prometheus label keys for application metrics are `exported_job`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`; do not build service and worker dashboards around `service_name` unless the exporter contract changes
+  - logs and traces drilldown dashboard is now a no-selector operational log board; service, environment, and level dimensions must be visible directly in panels instead of relying on template-variable state
+  - do not reintroduce fragile dashboard-variable flows for service/environment unless there is a strong proven operator benefit and a live validation path
+  - the logs dashboard should stay centered on recent logs, error logs, and volume-by-dimension views; do not execute an empty `trace_id` textbox as a Loki filter
+  - current Prometheus label keys for application metrics are `deployment_environment`, `exported_job`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`; do not build service and worker dashboards around `service_name` unless the exporter contract changes
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
 - current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented
 - current central runtime baseline: central compose now depends on repository-owned `loki/config.yaml` and `tempo/config.yaml`; if backend ports, mounted paths, or collector exporter targets change, update all three in the same change set

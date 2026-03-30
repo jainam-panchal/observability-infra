@@ -23,90 +23,285 @@
   "panels": [
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "loki",
+        "uid": "loki"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "unit": "ops"
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 5,
+        "w": 6,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
+        "textMode": "value_and_name"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(worker_job_started_total{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m]))",
-          "legendFormat": "jobs started/sec",
-          "range": true,
+          "expr": "sum(count_over_time({service_name=~\".*worker.*\"} |= \"starting job\" [15m]))",
+          "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Jobs Started Rate",
-      "type": "timeseries"
+      "title": "Job Start Logs Last 15m",
+      "type": "stat"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "loki",
+        "uid": "loki"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "unit": "ops"
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
+        "h": 5,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
       "id": 2,
       "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service_name=~\".*worker.*\", level=\"ERROR\"}[15m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Worker Error Logs Last 15m",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(worker_job_duration_seconds_bucket[15m])))",
+          "legendFormat": "p95",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P95 Job Duration",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service_name=~\".*worker.*\"}[15m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Worker Log Lines Last 15m",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(worker_job_completed_total{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m]))",
-          "legendFormat": "jobs completed/sec",
+          "expr": "sum by (exported_job) (rate(worker_job_started_total[5m]))",
+          "legendFormat": "{{exported_job}} started",
           "range": true,
           "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum by (exported_job) (rate(worker_job_completed_total[5m]))",
+          "legendFormat": "{{exported_job}} completed",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Jobs Completed Rate",
+      "title": "Worker Throughput By Service",
       "type": "timeseries"
     },
     {
@@ -125,76 +320,34 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
+        "w": 8,
+        "x": 8,
+        "y": 5
       },
-      "id": 3,
+      "id": 6,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(worker_job_completed_total{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\",job_status=\"error\"}[5m]))",
-          "legendFormat": "jobs failed/sec",
+          "expr": "sum by (job_status) (rate(worker_job_completed_total[5m]))",
+          "legendFormat": "{{job_status}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Jobs Failed Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "(sum(rate(worker_job_completed_total{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\",job_status=\"success\"}[5m])) / clamp_min(sum(rate(worker_job_started_total{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m])), 1e-9)) * 100",
-          "legendFormat": "success %",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Job Success Percentage",
+      "title": "Worker Completion By Status",
       "type": "timeseries"
     },
     {
@@ -213,109 +366,17 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(worker_job_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m])))",
-          "legendFormat": "p50",
-          "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(worker_job_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m])))",
-          "legendFormat": "p95",
-          "refId": "B"
-        },
-        {
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(worker_job_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m])))",
-          "legendFormat": "p99",
-          "refId": "C"
-        }
-      ],
-      "title": "Job Duration",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(10, sum by (job_name) (rate(worker_job_started_total{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m])))",
-          "legendFormat": "{{job_name}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Top Job Types by Throughput",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 24
+        "w": 8,
+        "x": 16,
+        "y": 5
       },
       "id": 7,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
@@ -326,14 +387,102 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, histogram_quantile(0.95, sum by (job_name, le) (rate(worker_job_duration_seconds_bucket{exported_job=~\"$service\",instance=~\"$instance\",job_name=~\"$job_name\"}[5m]))))",
+          "expr": "histogram_quantile(0.95, sum by (job_name, le) (rate(worker_job_duration_seconds_bucket[5m])))",
           "legendFormat": "{{job_name}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Top Job Types by Latency",
+      "title": "P95 Duration By Job Name",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 13
+      },
+      "id": 8,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (deployment_environment) (increase(worker_job_started_total[15m]))",
+          "legendFormat": "{{deployment_environment}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Job Volume By Environment",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 13
+      },
+      "id": 9,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(10, sum by (job_name) (increase(worker_job_started_total[15m])))",
+          "legendFormat": "{{job_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top Job Names By Volume",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -350,256 +499,110 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
-      },
-      "id": 8,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=~\"$service\"} | json | level=\"error\" [5m]))",
-          "legendFormat": "error logs/5m",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Error Log Volume",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 32
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum(rate(process_cpu_time_seconds_total{exported_job=~\"$service\",instance=~\"$instance\"}[5m]))",
-          "legendFormat": "cpu seconds/sec",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Worker CPU Usage",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 32
+        "w": 8,
+        "x": 16,
+        "y": 13
       },
       "id": 10,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
           "placement": "bottom"
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(process_resident_memory_bytes{exported_job=~\"$service\",instance=~\"$instance\"})",
-          "legendFormat": "resident memory",
-          "range": true,
+          "expr": "sum by (level) (count_over_time({service_name=~\".*worker.*\"}[5m]))",
+          "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Worker Memory Usage",
+      "title": "Worker Log Volume By Level",
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
       "gridPos": {
-        "h": 6,
-        "w": 24,
+        "h": 10,
+        "w": 12,
         "x": 0,
-        "y": 40
+        "y": 21
       },
       "id": 11,
       "options": {
-        "content": "Phase-two worker metrics such as active jobs and retry counts are intentionally excluded from the initial dashboard JSON because the current shared package does not emit them yet.",
-        "mode": "markdown"
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
       },
-      "title": "Current Scope",
-      "type": "text"
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{service_name=~\".*worker.*\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Worker Logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 12,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{service_name=~\".*worker.*\", level=\"ERROR\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Worker Error Logs",
+      "type": "logs"
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "schemaVersion": 39,
   "style": "dark",
   "tags": [
     "observability",
-    "workers"
+    "worker",
+    "backend"
   ],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(process_uptime_seconds, deployment_environment)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Environment",
-        "multi": true,
-        "name": "environment",
-        "options": [],
-        "query": {
-          "query": "label_values(deployment_environment)",
-          "refId": "Prometheus-environment"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(process_uptime_seconds{deployment_environment=~\"$environment\"}, service_name)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Service",
-        "multi": true,
-        "name": "service",
-        "options": [],
-        "query": {
-          "query": "label_values(worker_job_started_total, exported_job)",
-          "refId": "Prometheus-service"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(process_uptime_seconds{deployment_environment=~\"$environment\",service_name=~\"$service\"}, instance)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Instance",
-        "multi": true,
-        "name": "instance",
-        "options": [],
-        "query": {
-          "query": "label_values(worker_job_started_total{exported_job=~\"$service\"}, instance)",
-          "refId": "Prometheus-instance"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": ".*",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(worker_job_started_total{deployment_environment=~\"$environment\",service_name=~\"$service\",instance=~\"$instance\"}, job_name)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Job Name",
-        "multi": true,
-        "name": "job_name",
-        "options": [],
-        "query": {
-          "query": "label_values(worker_job_started_total{exported_job=~\"$service\",instance=~\"$instance\"}, job_name)",
-          "refId": "Prometheus-job-name"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      }
-    ]
+    "list": []
   },
   "time": {
     "from": "now-6h",

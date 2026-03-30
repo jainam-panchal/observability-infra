@@ -46,7 +46,7 @@ datasources:
         filterByTraceID: true
         filterBySpanID: false
         customQuery: true
-        query: '{service="$${__span.tags.service.name}"} |= "$${__trace.traceId}"'
+        query: '{service_name="$${__span.tags.service.name}"} |= "$${__trace.traceId}"'
       nodeGraph:
         enabled: true
       search:

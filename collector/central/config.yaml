@@ -16,6 +16,18 @@ processors:
     limit_mib: 512
     spike_limit_mib: 128
 
+  attributes/loki:
+    actions:
+      - action: insert
+        key: loki.attribute.labels
+        value: level
+
+  resource/loki:
+    attributes:
+      - action: insert
+        key: loki.resource.labels
+        value: service.name,deployment.environment
+
   batch:
     send_batch_size: 2048
     timeout: 5s
@@ -65,6 +77,8 @@ service:
         - otlp
       processors:
         - memory_limiter
+        - attributes/loki
+        - resource/loki
         - batch
       exporters:
         - loki

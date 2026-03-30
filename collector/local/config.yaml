@@ -26,6 +26,11 @@ receivers:
         type: move
         from: attributes.log
         to: body
+      - id: app-json-parser
+        type: json_parser
+        parse_from: body
+        if: body matches "^\\{"
+        on_error: send_quiet
       - id: container-id-extractor
         type: regex_parser
         parse_from: attributes["log.file.path"]
@@ -34,6 +39,14 @@ receivers:
         type: move
         from: attributes.container_id
         to: resource["container.id"]
+      - id: app-service-resource
+        type: move
+        from: attributes.service
+        to: resource["service.name"]
+      - id: app-environment-resource
+        type: move
+        from: attributes.deployment_environment
+        to: resource["deployment.environment"]
 
 processors:
   memory_limiter:
