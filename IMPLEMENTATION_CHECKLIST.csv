@@ -1,5 +1,5 @@
 id,repo,workstream,task,status,priority,verification,notes
-GO-001,go-observability,bootstrap,"Create go.mod for github.com/jainam-panchal/go-observability",todo,high,"SMK-GO-001","Initialize module and baseline package layout"
+GO-001,go-observability,bootstrap,"Create go.mod for github.com/jainam-panchal/go-observability",done,high,"SMK-GO-000","Implemented in repo root commit e1c0220 with baseline package layout and verified by strict scaffold smoke"
 GO-002,go-observability,bootstrap,"Implement telemetry config defaults and environment loader",todo,high,"SMK-GO-001","Include OTLP endpoint, service metadata, sampling, traces, and metrics flags"
 GO-003,go-observability,bootstrap,"Implement Init and Shutdown lifecycle for OpenTelemetry providers",todo,high,"SMK-GO-001","Return explicit shutdown function and handle partial init errors"
 GO-004,go-observability,logging,"Implement Zap-compatible trace-aware structured logger wrapper",todo,high,"SMK-GO-002","Inject trace_id and span_id when context contains an active span and support container-friendly JSON logging"
@@ -30,6 +30,7 @@ ROL-002,cross-repo,pilot,"Integrate one Go worker service with go-observability 
 ROL-003,cross-repo,pilot,"Validate trace-to-log correlation for API and worker flows",todo,high,"SMK-E2E-003","Use trace_id pivot in Grafana"
 ROL-004,cross-repo,pilot,"Validate critical alerts fire correctly in non-production",todo,medium,"SMK-INF-006","Test 5xx, latency, collector failure, and disk pressure scenarios as feasible"
 ROL-005,cross-repo,release,"Prepare generic rollout checklist for additional Go services",todo,medium,"SMK-DOC-001","Convert pilot learnings into repeatable adoption steps for Go Gin applications"
+SMK-GO-000,go-observability,smoke,"Smoke module scaffold sanity",done,high,"gofmt -w ./telemetry/doc.go ./logger/doc.go ./middleware/doc.go ./database/doc.go ./httpclient/doc.go ./worker/doc.go && go vet ./... && go test ./... && go test -race ./... && ~/go/bin/golangci-lint run","Pass criteria met: module resolves, baseline packages compile, race test passes, and lint is clean"
 SMK-GO-001,go-observability,smoke,"Smoke bootstrap lifecycle and env contract",todo,high,"go test ./... -run TestConfig|TestInit|TestShutdown","Pass criteria: config loading works, providers initialize, shutdown returns cleanly"
 SMK-GO-002,go-observability,smoke,"Smoke Gin + logging + outbound HTTP instrumentation",todo,high,"go test ./... -run TestGin|TestLogger|TestHTTPClient","Pass criteria: request span created, trace_id injected in logs, outbound child spans recorded"
 SMK-GO-003,go-observability,smoke,"Smoke GORM instrumentation for queries and transactions",todo,high,"go test ./... -run TestGORM","Pass criteria: query and transaction spans created with context propagation"
