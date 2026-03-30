@@ -46,3 +46,4 @@ Checklist rule:
 ## Implementation Context
 
 - `go-observability` logger verification now has a dedicated smoke gate `SMK-GO-007`; cross-repo checklist updates should preserve that separation instead of bundling logger proof into broader Gin/http smoke rows
+- `go-observability` Gin middleware verification now has a dedicated smoke gate `SMK-GO-008`; cross-repo checklist updates should preserve inbound middleware proof separately from outbound HTTP instrumentation
