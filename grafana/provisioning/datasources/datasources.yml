@@ -51,6 +51,7 @@ datasources:
         enabled: true
       search:
         hide: false
+      timeRangeForTags: 86400
       spanBar:
         type: Tag
         tag: http.method
