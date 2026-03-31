@@ -22,6 +22,19 @@
   "links": [],
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Fleet Summary",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -35,12 +48,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 1
       },
-      "id": 1,
+      "id": 2,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -58,41 +71,30 @@
         },
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])) or vector(0)",
+          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
           "instant": true,
           "range": false,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "100 * ((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval])) or on() vector(0)) / clamp_min(sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])), 1))",
+          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "C"
         },
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "instant": true,
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "editorMode": "code",
           "expr": "sum by (deployment_environment_name, exported_job) (http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
           "instant": true,
           "range": false,
-          "refId": "E"
+          "refId": "D"
         }
       ],
       "title": "Service Summary",
       "transformations": [
         {
           "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "merge",
           "options": {}
         },
         {
@@ -106,15 +108,27 @@
               "exported_job": "Service",
               "Value": "Requests",
               "Value #A": "Requests",
-              "Value #B": "5xx",
-              "Value #C": "Error %",
-              "Value #D": "P95",
-              "Value #E": "Active"
+              "Value #B": "Error %",
+              "Value #C": "P95",
+              "Value #D": "Active"
             }
           }
         }
       ],
       "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 3,
+      "panels": [],
+      "title": "Traffic And Latency",
+      "type": "row"
     },
     {
       "datasource": {
@@ -128,7 +142,7 @@
           },
           "custom": {
             "drawStyle": "line",
-            "fillOpacity": 10,
+            "fillOpacity": 8,
             "lineInterpolation": "linear",
             "lineWidth": 2,
             "showPoints": "never"
@@ -139,11 +153,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
-        "y": 10
+        "y": 11
       },
-      "id": 2,
+      "id": 4,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -179,7 +193,58 @@
           },
           "custom": {
             "drawStyle": "line",
-            "fillOpacity": 10,
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 11
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), 1))",
+          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate By Service",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
             "lineInterpolation": "linear",
             "lineWidth": 2,
             "showPoints": "never"
@@ -190,11 +255,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 10
+        "w": 8,
+        "x": 16,
+        "y": 11
       },
-      "id": 3,
+      "id": 6,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -295,6 +360,6 @@
   "timezone": "",
   "title": "Service Fleet",
   "uid": "service-overview",
-  "version": 5,
+  "version": 6,
   "weekStart": ""
 }

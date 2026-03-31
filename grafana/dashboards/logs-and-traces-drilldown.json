@@ -22,6 +22,19 @@
   "links": [],
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Log Health Summary",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "loki",
         "uid": "loki"
@@ -37,15 +50,15 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 8,
+        "w": 4,
         "x": 0,
-        "y": 0
+        "y": 1
       },
-      "id": 1,
+      "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -59,8 +72,7 @@
         {
           "editorMode": "code",
           "expr": "sum(count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__range]))",
-          "instant": true,
-          "queryType": "instant",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -83,15 +95,15 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 8,
+        "w": 4,
         "x": 8,
-        "y": 0
+        "y": 1
       },
-      "id": 2,
+      "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -105,8 +117,7 @@
         {
           "editorMode": "code",
           "expr": "sum(count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"}[$__range]))",
-          "instant": true,
-          "queryType": "instant",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -129,15 +140,15 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 8,
+        "w": 4,
         "x": 16,
-        "y": 0
+        "y": 1
       },
-      "id": 3,
+      "id": 4,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -151,13 +162,25 @@
         {
           "editorMode": "code",
           "expr": "sum(count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} |~ \"trace_id\" [$__range]))",
-          "instant": true,
-          "queryType": "instant",
+          "range": true,
           "refId": "A"
         }
       ],
       "title": "Logs With Trace IDs",
       "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Aggregations",
+      "type": "row"
     },
     {
       "datasource": {
@@ -168,18 +191,17 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
+        "h": 10,
+        "w": 12,
         "x": 0,
-        "y": 4
+        "y": 6
       },
-      "id": 4,
+      "id": 6,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -224,13 +246,69 @@
         "type": "loki",
         "uid": "loki"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (level) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__interval]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log Volume Over Time By Level",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Investigation",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
       "gridPos": {
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 12
+        "y": 17
       },
-      "id": 5,
+      "id": 9,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -261,9 +339,9 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 12
+        "y": 17
       },
-      "id": 6,
+      "id": 10,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -386,6 +464,6 @@
   "timezone": "",
   "title": "Logs Investigation",
   "uid": "logs-and-traces-drilldown",
-  "version": 5,
+  "version": 6,
   "weekStart": ""
 }
