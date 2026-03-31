@@ -463,8 +463,9 @@
         {
           "editorMode": "code",
           "expr": "topk(8, sum by (http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "instant": true,
           "legendFormat": "{{http_route}}",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -521,8 +522,9 @@
         {
           "editorMode": "code",
           "expr": "topk(8, histogram_quantile(0.95, sum by (le, http_route) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
+          "instant": true,
           "legendFormat": "{{http_route}}",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
