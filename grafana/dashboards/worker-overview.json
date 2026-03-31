@@ -404,16 +404,11 @@
       },
       "id": 8,
       "options": {
-        "displayMode": "basic",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "showUnfilled": true
+        "showHeader": true
       },
       "targets": [
         {
@@ -425,7 +420,25 @@
         }
       ],
       "title": "Top Job Names By Volume",
-      "type": "bargauge"
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "job_name": "Job Name",
+              "Value": "Started Jobs"
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
@@ -449,16 +462,11 @@
       },
       "id": 9,
       "options": {
-        "displayMode": "basic",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "showUnfilled": true
+        "showHeader": true
       },
       "targets": [
         {
@@ -470,7 +478,25 @@
         }
       ],
       "title": "Slowest Job Names By P95",
-      "type": "bargauge"
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "job_name": "Job Name",
+              "Value": "P95 Duration"
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "refresh": "10s",
