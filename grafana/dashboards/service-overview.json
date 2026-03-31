@@ -42,325 +42,6 @@
       },
       "id": 1,
       "panels": [],
-      "title": "Service Triage",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Service"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "Open Service Performance",
-                    "url": "/d/service-performance/service-performance?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
-                  },
-                  {
-                    "title": "Open Logs",
-                    "url": "/d/logs-and-errors/logs-and-errors?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 1
-      },
-      "id": 2,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"4..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "C"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "E"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (http_server_active_requests{deployment_environment_name=~\"$environment\"})), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "F"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "deployment_environment_name": true,
-              "exported_job": true
-            },
-            "renameByName": {
-              "Value": "Request Rate",
-              "Value #A": "Request Rate",
-              "Value #B": "4xx Rate %",
-              "Value #C": "5xx Rate %",
-              "Value #D": "P95",
-              "Value #E": "P99",
-              "Value #F": "Active",
-              "scope": "Target"
-            }
-          }
-        }
-      ],
-      "title": "Service Summary",
-      "type": "table",
-      "description": "Fleet summary across services in the selected environment. Pick a concrete service for the focused section below."
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 10
-      },
-      "id": 3,
-      "panels": [],
-      "title": "Traffic And Latency",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 11
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Request Rate By Service",
-      "type": "timeseries",
-      "description": "Traffic trend by service and environment."
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 11
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"4..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}} 4xx",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}} 5xx",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "4xx And 5xx By Service",
-      "type": "timeseries",
-      "description": "Clear separation of client noise vs server failure."
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 11
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}} p95",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}} p99",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Tail Latency By Service",
-      "type": "timeseries",
-      "description": "Tail latency tells you how bad the user experience actually is."
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 19
-      },
-      "id": 7,
-      "panels": [],
       "title": "Selected Service",
       "type": "row"
     },
@@ -382,9 +63,9 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 20
+        "y": 1
       },
-      "id": 8,
+      "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -408,7 +89,7 @@
       ],
       "title": "Requests",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Total API requests for the selected service in the visible window."
     },
     {
       "datasource": {
@@ -420,7 +101,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "short"
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 20,
+                "color": "orange"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -428,9 +125,9 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 20
+        "y": 1
       },
-      "id": 9,
+      "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -454,7 +151,7 @@
       ],
       "title": "4xx",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Where validation, auth, and client misuse are landing."
     },
     {
       "datasource": {
@@ -490,9 +187,9 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 20
+        "y": 1
       },
-      "id": 10,
+      "id": 4,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -516,7 +213,7 @@
       ],
       "title": "5xx",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Where the service is actually breaking."
     },
     {
       "datasource": {
@@ -528,7 +225,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "s"
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 0.3,
+                "color": "yellow"
+              },
+              {
+                "value": 1,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -536,9 +249,9 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 20
+        "y": 1
       },
-      "id": 11,
+      "id": 5,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -562,7 +275,7 @@
       ],
       "title": "P95",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Tail latency across the selected window."
     },
     {
       "datasource": {
@@ -574,7 +287,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "s"
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 0.75,
+                "color": "yellow"
+              },
+              {
+                "value": 2,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -582,9 +311,9 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 20
+        "y": 1
       },
-      "id": 12,
+      "id": 6,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -608,7 +337,7 @@
       ],
       "title": "P99",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Worst-case user experience signal."
     },
     {
       "datasource": {
@@ -620,7 +349,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "short"
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 10,
+                "color": "yellow"
+              },
+              {
+                "value": 50,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -628,9 +373,9 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 20
+        "y": 1
       },
-      "id": 13,
+      "id": 7,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -654,7 +399,7 @@
       ],
       "title": "Active",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Current in-flight request pressure."
     },
     {
       "datasource": {
@@ -679,11 +424,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
-        "y": 24
+        "y": 5
       },
-      "id": 14,
+      "id": 8,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -720,7 +465,7 @@
       ],
       "title": "Request Rate By Status Family",
       "type": "timeseries",
-      "description": "How the selected service is failing right now. Uses the selected service only."
+      "description": "Shows whether the problem is client-side noise or server-side breakage."
     },
     {
       "datasource": {
@@ -745,11 +490,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 24
+        "w": 8,
+        "x": 8,
+        "y": 5
       },
-      "id": 15,
+      "id": 9,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -765,14 +510,73 @@
         {
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le, http_request_method) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
-          "legendFormat": "{{http_request_method}}",
+          "legendFormat": "{{http_request_method}} p95",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by (le, http_request_method) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
+          "legendFormat": "{{http_request_method}} p99",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Tail Latency By Method",
+      "type": "timeseries",
+      "description": "API-level latency split by method."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 5
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le, server_address) (increase(http_client_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "legendFormat": "{{server_address}} p95",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Latency By Method",
+      "title": "Downstream Dependency Latency",
       "type": "timeseries",
-      "description": "Find whether one verb shape is driving tail latency. Uses the selected service only."
+      "description": "Dependency latency over the selected window, which is more stable for sparse outbound traffic."
     },
     {
       "collapsed": false,
@@ -780,11 +584,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 13
       },
-      "id": 16,
+      "id": 11,
       "panels": [],
-      "title": "Endpoint Drilldown",
+      "title": "Endpoint Debugging",
       "type": "row"
     },
     {
@@ -804,9 +608,9 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 33
+        "y": 14
       },
-      "id": 17,
+      "id": 12,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -843,9 +647,9 @@
           }
         }
       ],
-      "title": "Endpoint Volume",
+      "title": "Hot Endpoints",
       "type": "table",
-      "description": "What endpoints are hottest in the selected window. Uses the selected service only."
+      "description": "Where the API is actually receiving traffic."
     },
     {
       "datasource": {
@@ -864,9 +668,9 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 33
+        "y": 14
       },
-      "id": 18,
+      "id": 13,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -877,7 +681,67 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range]))) or vector(0)",
+          "expr": "topk(15, sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__range])))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "http_request_method": "Method",
+              "http_route": "Route",
+              "Value": "4xx",
+              "Value #A": "4xx"
+            }
+          }
+        }
+      ],
+      "title": "Validation / Client Error Endpoints",
+      "type": "table",
+      "description": "Which routes are producing validation/auth/client errors."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 14
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -903,9 +767,9 @@
           }
         }
       ],
-      "title": "Top 5xx Endpoints",
+      "title": "Server Error Endpoints",
       "type": "table",
-      "description": "Exactly where server-side failures are concentrated. Uses the selected service only."
+      "description": "Which routes are actually breaking server-side."
     },
     {
       "datasource": {
@@ -922,11 +786,11 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 8,
-        "x": 16,
-        "y": 33
+        "w": 12,
+        "x": 0,
+        "y": 24
       },
-      "id": 19,
+      "id": 15,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -965,124 +829,7 @@
       ],
       "title": "Slow Endpoints",
       "type": "table",
-      "description": "Tail latency outliers by route. Uses the selected service only."
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 43
-      },
-      "id": 20,
-      "panels": [],
-      "title": "Dependency Impact",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 44
-      },
-      "id": 21,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (server_address) (rate(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))",
-          "legendFormat": "{{server_address}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Downstream Request Rate By Dependency",
-      "type": "timeseries",
-      "description": "Which downstreams are active while this service is failing. Uses the selected service only."
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 44
-      },
-      "id": 22,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, server_address) (rate(http_client_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
-          "legendFormat": "{{server_address}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Downstream Tail Latency",
-      "type": "timeseries",
-      "description": "Whether dependency latency is driving service latency. Uses the selected service only."
+      "description": "Tail latency outliers by endpoint."
     },
     {
       "datasource": {
@@ -1098,12 +845,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 44
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 24
       },
-      "id": 23,
+      "id": 16,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -1114,7 +861,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, 100 * (((sum by (server_address) (rate(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..|5..\"}[$__rate_interval]))) or on (server_address) (0 * (sum by (server_address) (rate(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))))) / clamp_min((sum by (server_address) (rate(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), 1)))",
+          "expr": "topk(15, 100 * ((sum by (server_address) (increase(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..|5..\"}[$__range]))) / clamp_min((sum by (server_address) (increase(http_client_request_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1)))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -1139,9 +886,97 @@
           }
         }
       ],
-      "title": "Dependency Non-2xx Rate",
+      "title": "Dependency Error Surface",
       "type": "table",
-      "description": "Blast radius across downstream dependencies. Uses the selected service only."
+      "description": "Dependency non-success ratio over the selected window."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 17,
+      "panels": [],
+      "title": "Fleet Triage",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 18,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "instant": true,
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "instant": true,
+          "range": false,
+          "refId": "C"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "scope": "Target",
+              "Value": "Request Rate",
+              "Value #A": "Request Rate",
+              "Value #B": "5xx %",
+              "Value #C": "P95"
+            }
+          }
+        }
+      ],
+      "title": "Fleet Summary",
+      "type": "table",
+      "description": "Compact fleet triage. Use it to jump between services."
     }
   ],
   "refresh": "10s",
@@ -1175,7 +1010,7 @@
         "query": {
           "qryType": 1,
           "query": "label_values(http_server_request_count_total, deployment_environment_name)",
-          "refId": "PromVar-environment"
+          "refId": "Var-environment"
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -1203,7 +1038,7 @@
         "query": {
           "qryType": 1,
           "query": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
-          "refId": "PromVar-service"
+          "refId": "Var-service"
         },
         "refresh": 1,
         "skipUrlSync": false,

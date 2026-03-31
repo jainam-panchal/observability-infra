@@ -42,311 +42,6 @@
       },
       "id": 1,
       "panels": [],
-      "title": "Worker Triage",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Service"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "Open Background Processing",
-                    "url": "/d/background-processing/background-processing?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
-                  },
-                  {
-                    "title": "Open Logs",
-                    "url": "/d/logs-and-errors/logs-and-errors?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 1
-      },
-      "id": 2,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"success|ok|completed\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__range])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "C"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__range]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__range])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "E"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__range])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "F"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "deployment_environment_name": true,
-              "exported_job": true
-            },
-            "renameByName": {
-              "Value": "Started",
-              "Value #A": "Started",
-              "Value #B": "Completed",
-              "Value #C": "Failed",
-              "Value #D": "Failure %",
-              "Value #E": "P95",
-              "Value #F": "P99",
-              "scope": "Target"
-            }
-          }
-        }
-      ],
-      "title": "Worker Summary",
-      "type": "table",
-      "description": "Fleet summary across worker services in the selected environment. Pick a concrete service for the focused section below."
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 10
-      },
-      "id": 3,
-      "panels": [],
-      "title": "Throughput And Failures",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 11
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__interval]))))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Observed Job Starts By Service",
-      "type": "timeseries",
-      "description": "Observed job starts over time."
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 11
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__interval]))))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Failure Trend By Service",
-      "type": "timeseries",
-      "description": "Bursting or sustained worker failures."
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 8,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 11
-      },
-      "id": 6,
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__interval])))",
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Duration Tail By Service",
-      "type": "timeseries",
-      "description": "Tail completion time by worker service."
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 19
-      },
-      "id": 7,
-      "panels": [],
       "title": "Selected Worker",
       "type": "row"
     },
@@ -368,9 +63,9 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 20
+        "y": 1
       },
-      "id": 8,
+      "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -394,7 +89,7 @@
       ],
       "title": "Started",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Observed job starts for the selected worker service."
     },
     {
       "datasource": {
@@ -414,9 +109,9 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 20
+        "y": 1
       },
-      "id": 9,
+      "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -440,7 +135,7 @@
       ],
       "title": "Completed",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Successful job completions."
     },
     {
       "datasource": {
@@ -476,9 +171,9 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 20
+        "y": 1
       },
-      "id": 10,
+      "id": 4,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -502,7 +197,7 @@
       ],
       "title": "Failed",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Real worker failures in the selected window."
     },
     {
       "datasource": {
@@ -514,7 +209,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "percent"
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 5,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -522,9 +233,9 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 20
+        "y": 1
       },
-      "id": 11,
+      "id": 5,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -541,14 +252,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
+          "expr": "100 * (((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range])) ) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Failure %",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Failure rate for the selected worker service."
     },
     {
       "datasource": {
@@ -560,7 +271,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "s"
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 5,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -568,9 +295,9 @@
         "h": 4,
         "w": 4,
         "x": 16,
-        "y": 20
+        "y": 1
       },
-      "id": 12,
+      "id": 6,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -594,7 +321,7 @@
       ],
       "title": "P95",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Tail duration for worker jobs."
     },
     {
       "datasource": {
@@ -606,7 +333,23 @@
           "color": {
             "mode": "background"
           },
-          "unit": "s"
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 2,
+                "color": "yellow"
+              },
+              {
+                "value": 8,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -614,9 +357,9 @@
         "h": 4,
         "w": 4,
         "x": 20,
-        "y": 20
+        "y": 1
       },
-      "id": 13,
+      "id": 7,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -640,7 +383,7 @@
       ],
       "title": "P99",
       "type": "stat",
-      "description": "Uses the selected service only."
+      "description": "Worst-case worker latency."
     },
     {
       "datasource": {
@@ -667,9 +410,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 24
+        "y": 5
       },
-      "id": 14,
+      "id": 8,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -697,9 +440,9 @@
           "refId": "B"
         }
       ],
-      "title": "Completion Trend By Status",
+      "title": "Job Completion Trend",
       "type": "timeseries",
-      "description": "Are failures isolated or sustained. Uses the selected service only."
+      "description": "Whether failures are bursty or sustained."
     },
     {
       "datasource": {
@@ -726,9 +469,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 24
+        "y": 5
       },
-      "id": 15,
+      "id": 9,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -744,14 +487,14 @@
         {
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval])))",
-          "legendFormat": "{{job_name}}",
+          "legendFormat": "{{job_name}} p95",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Duration Tail By Job",
       "type": "timeseries",
-      "description": "Which job types are slowing down. Uses the selected service only."
+      "description": "Which job types are slowing down."
     },
     {
       "collapsed": false,
@@ -759,11 +502,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 13
       },
-      "id": 16,
+      "id": 10,
       "panels": [],
-      "title": "Job Drilldown",
+      "title": "Job Debugging",
       "type": "row"
     },
     {
@@ -783,9 +526,9 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 33
+        "y": 14
       },
-      "id": 17,
+      "id": 11,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -824,7 +567,7 @@
       ],
       "title": "Job Outcomes",
       "type": "table",
-      "description": "Which job classes are failing. Uses the selected service only."
+      "description": "Which job classes are failing or succeeding."
     },
     {
       "datasource": {
@@ -843,9 +586,9 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 33
+        "y": 14
       },
-      "id": 18,
+      "id": 12,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -883,7 +626,7 @@
       ],
       "title": "Slow Jobs",
       "type": "table",
-      "description": "Which job types are delayed. Uses the selected service only."
+      "description": "Which job types are delayed."
     },
     {
       "collapsed": false,
@@ -891,31 +634,133 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 24
       },
-      "id": 19,
+      "id": 13,
       "panels": [],
-      "title": "Phase-Two Operational Signals",
+      "title": "Fleet Triage",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "grafana",
-        "uid": "-- Grafana --"
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 8,
         "w": 24,
         "x": 0,
-        "y": 44
+        "y": 25
       },
-      "id": 20,
+      "id": 14,
       "options": {
-        "content": "- `retry pressure`, `queue depth`, and `stuck job age` are intentionally deferred until first-class metrics exist.\n- Keep this row collapsed in future revisions until instrumentation lands.\n- Do not fake these panels from log searches.",
-        "mode": "markdown"
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
       },
-      "title": "Deferred Metrics",
-      "type": "text"
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__range])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "instant": true,
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "instant": true,
+          "range": false,
+          "refId": "C"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "scope": "Target",
+              "Value": "Started",
+              "Value #A": "Started",
+              "Value #B": "Failed",
+              "Value #C": "P95"
+            }
+          }
+        }
+      ],
+      "title": "Fleet Summary",
+      "type": "table",
+      "description": "Compact fleet triage. Use it to scan other worker services."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Phase-Two Signals",
+      "type": "stat",
+      "description": "Retry pressure, queue depth, and stuck-job age remain deferred until first-class metrics exist."
     }
   ],
   "refresh": "10s",
@@ -949,7 +794,7 @@
         "query": {
           "qryType": 1,
           "query": "label_values(worker_job_started_total, deployment_environment_name)",
-          "refId": "PromVar-environment"
+          "refId": "Var-environment"
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -977,7 +822,7 @@
         "query": {
           "qryType": 1,
           "query": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
-          "refId": "PromVar-service"
+          "refId": "Var-service"
         },
         "refresh": 1,
         "skipUrlSync": false,
