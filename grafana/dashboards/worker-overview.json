@@ -375,7 +375,8 @@
             "renameByName": {
               "deployment_environment_name": "Environment",
               "exported_job": "Service",
-              "Value": "Started Jobs"
+              "Value": "Started Jobs",
+              "Value #A": "Started Jobs"
             }
           }
         }
@@ -434,7 +435,8 @@
             "renameByName": {
               "deployment_environment_name": "Environment",
               "exported_job": "Service",
-              "Value": "Failed Jobs"
+              "Value": "Failed Jobs",
+              "Value #A": "Failed Jobs"
             }
           }
         }
@@ -494,7 +496,8 @@
             "renameByName": {
               "deployment_environment_name": "Environment",
               "exported_job": "Service",
-              "Value": "P95 Duration"
+              "Value": "P95 Duration",
+              "Value #A": "P95 Duration"
             }
           }
         }

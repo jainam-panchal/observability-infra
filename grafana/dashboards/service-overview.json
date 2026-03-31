@@ -417,7 +417,8 @@
             "renameByName": {
               "deployment_environment_name": "Environment",
               "exported_job": "Service",
-              "Value": "Active Requests"
+              "Value": "Active Requests",
+              "Value #A": "Active Requests"
             }
           }
         }
@@ -476,7 +477,8 @@
             "renameByName": {
               "deployment_environment_name": "Environment",
               "exported_job": "Service",
-              "Value": "Requests"
+              "Value": "Requests",
+              "Value #A": "Requests"
             }
           }
         }
@@ -536,7 +538,8 @@
             "renameByName": {
               "deployment_environment_name": "Environment",
               "exported_job": "Service",
-              "Value": "P95 Latency"
+              "Value": "P95 Latency",
+              "Value #A": "P95 Latency"
             }
           }
         }

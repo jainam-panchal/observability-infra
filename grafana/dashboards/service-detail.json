@@ -592,7 +592,8 @@
             "renameByName": {
               "http_request_method": "Method",
               "http_route": "Route",
-              "Value": "Requests"
+              "Value": "Requests",
+              "Value #A": "Requests"
             }
           }
         }
@@ -652,7 +653,8 @@
             "renameByName": {
               "http_request_method": "Method",
               "http_route": "Route",
-              "Value": "4xx Requests"
+              "Value": "4xx Requests",
+              "Value #A": "4xx Requests"
             }
           }
         }
@@ -712,7 +714,8 @@
             "renameByName": {
               "http_request_method": "Method",
               "http_route": "Route",
-              "Value": "5xx Requests"
+              "Value": "5xx Requests",
+              "Value #A": "5xx Requests"
             }
           }
         }
@@ -772,7 +775,8 @@
             "renameByName": {
               "http_request_method": "Method",
               "http_route": "Route",
-              "Value": "P95 Latency"
+              "Value": "P95 Latency",
+              "Value #A": "P95 Latency"
             }
           }
         }

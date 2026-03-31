@@ -319,7 +319,8 @@
             "renameByName": {
               "deployment_environment": "Environment",
               "service_name": "Service",
-              "Value": "Log Lines"
+              "Value": "Log Lines",
+              "Value #A": "Log Lines"
             }
           }
         }
@@ -351,7 +352,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -384,7 +385,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"}",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
           "queryType": "range",
           "refId": "A"
         }

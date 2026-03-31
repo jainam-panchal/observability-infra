@@ -481,7 +481,8 @@
             },
             "renameByName": {
               "job_name": "Job Name",
-              "Value": "Started Jobs"
+              "Value": "Started Jobs",
+              "Value #A": "Started Jobs"
             }
           }
         }
@@ -540,7 +541,8 @@
             },
             "renameByName": {
               "job_name": "Job Name",
-              "Value": "P95 Duration"
+              "Value": "P95 Duration",
+              "Value #A": "P95 Duration"
             }
           }
         }
@@ -599,7 +601,8 @@
             },
             "renameByName": {
               "job_name": "Job Name",
-              "Value": "Failed Jobs"
+              "Value": "Failed Jobs",
+              "Value #A": "Failed Jobs"
             }
           }
         }
