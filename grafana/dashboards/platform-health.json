@@ -560,21 +560,21 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total[5m]))",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total[5m]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{http_response_status_code=~\"5..\"}[5m]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total[5m]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total[5m]))), 1))",
+          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{http_response_status_code=~\"5..\"}[5m]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total[5m]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total[5m]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket[5m])))",
+          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket[5m])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "C"
@@ -589,22 +589,23 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "deployment_environment_name": true,
+              "exported_job": true
             },
             "renameByName": {
-              "deployment_environment_name": "Environment",
-              "exported_job": "Service",
               "Value": "Request Rate",
               "Value #A": "Request Rate",
               "Value #B": "5xx %",
-              "Value #C": "P95"
+              "Value #C": "P95",
+              "scope": "Target"
             }
           }
         }
       ],
       "title": "Current Service Impact",
       "type": "table",
-      "description": "Tie platform stress to current service symptoms."
+      "description": "Summary view with one combined target column instead of repeating environment and service."
     },
     {
       "datasource": {
