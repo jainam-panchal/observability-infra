@@ -19,7 +19,23 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "title": "Service Performance",
+      "type": "link",
+      "url": "/d/service-performance/service-performance?var-environment=$environment&var-service=$service"
+    },
+    {
+      "title": "Background Processing",
+      "type": "link",
+      "url": "/d/background-processing/background-processing?var-environment=$environment&var-service=$service"
+    },
+    {
+      "title": "System Health",
+      "type": "link",
+      "url": "/d/system-health/system-health"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
@@ -31,7 +47,7 @@
       },
       "id": 1,
       "panels": [],
-      "title": "Log Health Summary",
+      "title": "Log Health",
       "type": "row"
     },
     {
@@ -50,7 +66,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -95,8 +111,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 1
       },
       "id": 3,
@@ -140,8 +156,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 16,
+        "w": 6,
+        "x": 12,
         "y": 1
       },
       "id": 4,
@@ -170,98 +186,33 @@
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 5
-      },
-      "id": 5,
-      "panels": [],
-      "title": "Aggregations",
-      "type": "row"
-    },
-    {
       "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 0,
-        "y": 6
-      },
-      "id": 6,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(20, sum by (deployment_environment, service_name) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__range])))",
-          "instant": true,
-          "queryType": "instant",
-          "refId": "A"
-        }
-      ],
-      "title": "Services By Log Volume",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "deployment_environment": "Environment",
-              "service_name": "Service",
-              "Value": "Log Lines",
-              "Value #A": "Log Lines"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 6
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
       },
-      "id": 7,
+      "id": 5,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -282,7 +233,163 @@
         }
       ],
       "title": "Log Volume Over Time By Level",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Is log volume spiking or failing quietly."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 6,
+      "panels": [],
+      "title": "Error Patterning",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Service"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open Logs And Errors",
+                    "url": "/d/logs-and-errors/logs-and-errors?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
+                  },
+                  {
+                    "title": "Open Service Performance",
+                    "url": "/d/service-performance/service-performance?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(20, sum by (deployment_environment, service_name) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__range])))",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "deployment_environment": "Environment",
+              "service_name": "Service",
+              "Value": "Log Lines",
+              "Value #A": "Log Lines"
+            }
+          }
+        }
+      ],
+      "title": "Services By Log Volume",
+      "type": "table",
+      "description": "Which services are generating the most logs."
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, sum by (service_name, msg) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | json | __error__=\"\" [$__range])))",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "service_name": "Service",
+              "msg": "Error Pattern",
+              "Value": "Count",
+              "Value #A": "Count"
+            }
+          }
+        }
+      ],
+      "title": "Structured Error Groups",
+      "type": "table",
+      "description": "Fast grouping of repeated structured errors."
     },
     {
       "collapsed": false,
@@ -292,7 +399,7 @@
         "x": 0,
         "y": 16
       },
-      "id": 8,
+      "id": 9,
       "panels": [],
       "title": "Investigation",
       "type": "row"
@@ -303,42 +410,9 @@
         "uid": "loki"
       },
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 0,
-        "y": 17
-      },
-      "id": 9,
-      "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": false,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Recent Logs",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
         "y": 17
       },
       "id": 10,
@@ -360,8 +434,43 @@
           "refId": "A"
         }
       ],
-      "title": "Recent Error Logs",
-      "type": "logs"
+      "title": "Live Error Stream",
+      "type": "logs",
+      "description": "Live incident stream for responders."
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 11,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Logs",
+      "type": "logs",
+      "description": "General log context around the incident."
     }
   ],
   "refresh": "10s",
@@ -370,7 +479,7 @@
   "tags": [
     "observability",
     "logs",
-    "investigation"
+    "production"
   ],
   "templating": {
     "list": [
@@ -395,7 +504,7 @@
         "query": {
           "label": "deployment_environment",
           "query": "label_values({deployment_environment=~\".+\"}, deployment_environment)",
-          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "refId": "LokiVar-environment",
           "stream": "{deployment_environment=~\".+\"}",
           "type": 1
         },
@@ -425,7 +534,7 @@
         "query": {
           "label": "service_name",
           "query": "label_values({deployment_environment=~\"${environment:raw}\"}, service_name)",
-          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "refId": "LokiVar-service",
           "stream": "{deployment_environment=~\"${environment:raw}\"}",
           "type": 1
         },
@@ -462,8 +571,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Logs Investigation",
-  "uid": "logs-and-traces-drilldown",
-  "version": 6,
+  "title": "Logs And Errors",
+  "uid": "logs-and-errors",
+  "version": 1,
   "weekStart": ""
 }

@@ -19,7 +19,18 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "title": "System Health",
+      "type": "link",
+      "url": "/d/system-health/system-health"
+    },
+    {
+      "title": "Logs And Errors",
+      "type": "link",
+      "url": "/d/logs-and-errors/logs-and-errors?var-environment=$environment&var-service=$service"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
@@ -31,7 +42,7 @@
       },
       "id": 1,
       "panels": [],
-      "title": "Fleet Summary",
+      "title": "Worker Triage",
       "type": "row"
     },
     {
@@ -45,7 +56,29 @@
             "mode": "palette-classic"
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Service"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open Background Processing",
+                    "url": "/d/background-processing/background-processing?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
+                  },
+                  {
+                    "title": "Open Logs",
+                    "url": "/d/logs-and-errors/logs-and-errors?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
@@ -71,20 +104,40 @@
         },
         {
           "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
+          "expr": "sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range]))",
           "instant": true,
           "range": false,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "expr": "sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
           "instant": true,
           "range": false,
           "refId": "C"
+        },
+        {
+          "editorMode": "code",
+          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
+          "instant": true,
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "instant": true,
+          "range": false,
+          "refId": "E"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "instant": true,
+          "range": false,
+          "refId": "F"
         }
       ],
-      "title": "Worker Summary",
       "transformations": [
         {
           "id": "labelsToFields",
@@ -101,13 +154,18 @@
               "exported_job": "Service",
               "Value": "Started",
               "Value #A": "Started",
-              "Value #B": "Failure %",
-              "Value #C": "P95"
+              "Value #B": "Completed",
+              "Value #C": "Failed",
+              "Value #D": "Failure %",
+              "Value #E": "P95",
+              "Value #F": "P99"
             }
           }
         }
       ],
-      "type": "table"
+      "title": "Worker Summary",
+      "type": "table",
+      "description": "Which worker services are unhealthy in the selected window."
     },
     {
       "collapsed": false,
@@ -164,14 +222,15 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))",
+          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Started Jobs By Service",
-      "type": "timeseries"
+      "title": "Observed Job Starts By Service",
+      "type": "timeseries",
+      "description": "Observed job starts over time."
     },
     {
       "datasource": {
@@ -190,7 +249,7 @@
             "lineWidth": 2,
             "showPoints": "never"
           },
-          "unit": "percent"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -215,14 +274,15 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))), 1))",
+          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Failure Rate By Service",
-      "type": "timeseries"
+      "title": "Failure Trend By Service",
+      "type": "timeseries",
+      "description": "Bursting or sustained worker failures."
     },
     {
       "datasource": {
@@ -272,8 +332,583 @@
           "refId": "A"
         }
       ],
-      "title": "P95 Duration By Service",
-      "type": "timeseries"
+      "title": "Duration Tail By Service",
+      "type": "timeseries",
+      "description": "Tail completion time by worker service."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 7,
+      "panels": [],
+      "title": "Selected Worker",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 20
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Started",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 20
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Completed",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "orange"
+              },
+              {
+                "value": 3,
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 20
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Failed",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 20
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100 * (((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Failure %",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 20
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P95",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 20
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by (le) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "P99",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__interval]))",
+          "legendFormat": "success",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__interval]))",
+          "legendFormat": "error",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Completion Trend By Status",
+      "type": "timeseries",
+      "description": "Are failures isolated or sustained."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval])))",
+          "legendFormat": "{{job_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Duration Tail By Job",
+      "type": "timeseries",
+      "description": "Which job types are slowing down."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Job Drilldown",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 33
+      },
+      "id": 17,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (job_name, job_status) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "job_name": "Job Name",
+              "job_status": "Status",
+              "Value": "Count",
+              "Value #A": "Count"
+            }
+          }
+        }
+      ],
+      "title": "Job Outcomes",
+      "type": "table",
+      "description": "Which job classes are failing."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 33
+      },
+      "id": 18,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "job_name": "Job Name",
+              "Value": "P95",
+              "Value #A": "P95"
+            }
+          }
+        }
+      ],
+      "title": "Slow Jobs",
+      "type": "table",
+      "description": "Which job types are delayed."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "id": 19,
+      "panels": [],
+      "title": "Phase-Two Operational Signals",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana",
+        "uid": "-- Grafana --"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
+      "id": 20,
+      "options": {
+        "content": "- `retry pressure`, `queue depth`, and `stuck job age` are intentionally deferred until first-class metrics exist.\n- Keep this row collapsed in future revisions until instrumentation lands.\n- Do not fake these panels from log searches.",
+        "mode": "markdown"
+      },
+      "title": "Deferred Metrics",
+      "type": "text"
     }
   ],
   "refresh": "10s",
@@ -282,7 +917,7 @@
   "tags": [
     "observability",
     "worker",
-    "fleet"
+    "production"
   ],
   "templating": {
     "list": [
@@ -307,7 +942,7 @@
         "query": {
           "qryType": 1,
           "query": "label_values(worker_job_started_total, deployment_environment_name)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          "refId": "PromVar-environment"
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -328,14 +963,14 @@
         "definition": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
         "hide": 0,
         "includeAll": true,
-        "label": "Worker Service",
+        "label": "Service",
         "multi": false,
         "name": "service",
         "options": [],
         "query": {
           "qryType": 1,
           "query": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          "refId": "PromVar-service"
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -345,13 +980,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Worker Fleet",
-  "uid": "worker-overview",
-  "version": 6,
+  "title": "Background Processing",
+  "uid": "background-processing",
+  "version": 1,
   "weekStart": ""
 }
