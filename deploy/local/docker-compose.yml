@@ -15,12 +15,13 @@ services:
       LOCAL_LOG_BATCH_TIMEOUT: ${LOCAL_LOG_BATCH_TIMEOUT}
       LOCAL_LOG_POLL_INTERVAL: ${LOCAL_LOG_POLL_INTERVAL}
     ports:
-      - "4317:4317"
-      - "4318:4318"
-      - "13133:13133"
+      - "14317:4317"
+      - "14318:4318"
+      - "11333:13133"
     volumes:
       - ../../collector/local/config.yaml:/etc/otelcol-contrib/config.yaml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /tmp/observability-logs:/var/telemetry-logs:ro
     networks:
       - local-observability
 

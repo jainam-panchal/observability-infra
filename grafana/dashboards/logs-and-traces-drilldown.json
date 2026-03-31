@@ -21,7 +21,7 @@
   "id": null,
   "links": [
     {
-      "title": "API Debug",
+      "title": "Service Performance",
       "type": "link",
       "url": "/d/service-performance/service-performance?var-environment=$environment&var-service=$service"
     },
@@ -61,7 +61,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
+        "w": 8,
         "x": 0,
         "y": 1
       },
@@ -81,13 +81,12 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "round(sum(count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__range])))",
-          "range": true,
+          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"}[$__range]))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
-      "title": "Log Lines",
+      "title": "Log Lines In Range",
       "type": "stat"
     },
     {
@@ -106,8 +105,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 6,
+        "w": 8,
+        "x": 8,
         "y": 1
       },
       "id": 3,
@@ -126,13 +125,12 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "round(sum(count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"}[$__range])))",
-          "range": true,
+          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\" [$__range]))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
-      "title": "Error Logs",
+      "title": "Error Logs In Range",
       "type": "stat"
     },
     {
@@ -151,8 +149,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 12,
+        "w": 8,
+        "x": 16,
         "y": 1
       },
       "id": 4,
@@ -171,9 +169,8 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "round(sum(count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} |~ \"trace_id\" [$__range])))",
-          "range": true,
+          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"trace[_-]?id|traceid\" [$__range]))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
@@ -182,8 +179,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "loki",
+        "uid": "loki"
       },
       "fieldConfig": {
         "defaults": {
@@ -192,7 +189,7 @@
           },
           "custom": {
             "drawStyle": "line",
-            "fillOpacity": 8,
+            "fillOpacity": 12,
             "lineInterpolation": "linear",
             "lineWidth": 2,
             "showPoints": "never"
@@ -202,10 +199,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 1
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
       },
       "id": 5,
       "options": {
@@ -221,15 +218,14 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__interval]))",
+          "expr": "sum by (service_name) (count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__interval]))",
+          "legendFormat": "{{service_name}}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log Volume Over Time By Level",
-      "type": "timeseries",
-      "description": "Is log volume spiking or failing quietly."
+      "title": "Log Volume Trend",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -237,7 +233,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 13
       },
       "id": 6,
       "panels": [],
@@ -255,35 +251,13 @@
             "mode": "palette-classic"
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Service"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "Open Logs And Errors",
-                    "url": "/d/logs-and-errors/logs-and-errors?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
-                  },
-                  {
-                    "title": "Open Service Performance",
-                    "url": "/d/service-performance/service-performance?var-environment=${__data.fields.Environment}&var-service=${__value.raw}"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 14
       },
       "id": 7,
       "options": {
@@ -295,9 +269,7 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "topk(20, round(sum by (deployment_environment, service_name) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__range]))))",
-          "instant": true,
+          "expr": "topk(20, sum by (service_name) (count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"}[$__range])))",
           "queryType": "instant",
           "refId": "A"
         }
@@ -315,7 +287,6 @@
               "__name__": true
             },
             "renameByName": {
-              "deployment_environment": "Environment",
               "service_name": "Service",
               "Value": "Log Lines",
               "Value #A": "Log Lines"
@@ -324,8 +295,7 @@
         }
       ],
       "title": "Services By Log Volume",
-      "type": "table",
-      "description": "Which services are producing the most logs in the selected scope."
+      "type": "table"
     },
     {
       "datasource": {
@@ -341,10 +311,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 14
       },
       "id": 8,
       "options": {
@@ -356,9 +326,7 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "topk(15, round(sum by (service_name) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"}[$__range]))))",
-          "instant": true,
+          "expr": "topk(20, sum by (service_name) (count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\" [$__range])))",
           "queryType": "instant",
           "refId": "A"
         }
@@ -377,15 +345,14 @@
             },
             "renameByName": {
               "service_name": "Service",
-              "Value": "Errors",
-              "Value #A": "Errors"
+              "Value": "Error Logs",
+              "Value #A": "Error Logs"
             }
           }
         }
       ],
       "title": "Errors By Service",
-      "type": "table",
-      "description": "Which services are currently producing error logs."
+      "type": "table"
     },
     {
       "collapsed": false,
@@ -393,7 +360,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 22
       },
       "id": 9,
       "panels": [],
@@ -406,10 +373,10 @@
         "uid": "loki"
       },
       "gridPos": {
-        "h": 11,
+        "h": 10,
         "w": 12,
         "x": 0,
-        "y": 17
+        "y": 23
       },
       "id": 10,
       "options": {
@@ -424,15 +391,13 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
       "title": "Recent Error Logs",
-      "type": "logs",
-      "description": "Latest application errors across the selected scope."
+      "type": "logs"
     },
     {
       "datasource": {
@@ -440,10 +405,10 @@
         "uid": "loki"
       },
       "gridPos": {
-        "h": 11,
+        "h": 10,
         "w": 12,
         "x": 12,
-        "y": 17
+        "y": 23
       },
       "id": 11,
       "options": {
@@ -458,15 +423,13 @@
       },
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
       "title": "Recent Logs",
-      "type": "logs",
-      "description": "General log context around the incident."
+      "type": "logs"
     }
   ],
   "refresh": "10s",
@@ -490,7 +453,7 @@
           "type": "loki",
           "uid": "loki"
         },
-        "definition": "label_values({deployment_environment=~\".+\"}, deployment_environment)",
+        "definition": "label_values({deployment_environment_name=~\".+\"}, deployment_environment_name)",
         "hide": 0,
         "includeAll": true,
         "label": "Environment",
@@ -498,10 +461,10 @@
         "name": "environment",
         "options": [],
         "query": {
-          "label": "deployment_environment",
-          "query": "label_values({deployment_environment=~\".+\"}, deployment_environment)",
+          "label": "deployment_environment_name",
+          "query": "label_values({deployment_environment_name=~\".+\"}, deployment_environment_name)",
           "refId": "LokiVar-environment",
-          "stream": "{deployment_environment=~\".+\"}",
+          "stream": "{deployment_environment_name=~\".+\"}",
           "type": 1
         },
         "refresh": 1,
@@ -520,7 +483,7 @@
           "type": "loki",
           "uid": "loki"
         },
-        "definition": "label_values({deployment_environment=~\"${environment:raw}\"}, service_name)",
+        "definition": "label_values({deployment_environment_name=~\"${environment:raw}\"}, service_name)",
         "hide": 0,
         "includeAll": true,
         "label": "Service",
@@ -529,9 +492,9 @@
         "options": [],
         "query": {
           "label": "service_name",
-          "query": "label_values({deployment_environment=~\"${environment:raw}\"}, service_name)",
+          "query": "label_values({deployment_environment_name=~\"${environment:raw}\"}, service_name)",
           "refId": "LokiVar-service",
-          "stream": "{deployment_environment=~\"${environment:raw}\"}",
+          "stream": "{deployment_environment_name=~\"${environment:raw}\"}",
           "type": 1
         },
         "refresh": 1,
@@ -546,14 +509,14 @@
           "text": "All",
           "value": ".+"
         },
-        "definition": ".+,INFO,WARN,ERROR,DEBUG",
+        "definition": ".+,INFO,WARN,ERROR,DEBUG,FATAL,PANIC",
         "hide": 0,
         "includeAll": true,
         "label": "Level",
         "multi": false,
         "name": "level",
         "options": [],
-        "query": ".+,INFO,WARN,ERROR,DEBUG",
+        "query": ".+,INFO,WARN,ERROR,DEBUG,FATAL,PANIC",
         "refresh": 1,
         "skipUrlSync": false,
         "sort": 0,

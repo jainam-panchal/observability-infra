@@ -76,17 +76,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, round(sum by (job_name) (max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range]))))",
+          "expr": "topk(15, round(sum by (job_name) (clamp_min(increase(db_query_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__range]), 0))))",
           "instant": true,
           "range": false,
+          "format": "table",
           "refId": "A"
         }
       ],
       "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
         {
           "id": "organize",
           "options": {
@@ -137,17 +134,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, (sum by (job_name) (max_over_time(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])) / clamp_min(sum by (job_name) (max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])), 1)))",
+          "expr": "topk(15, 1000 * (sum by (job_name) (clamp_min(increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__range]), 0)) / clamp_min(sum by (job_name) (clamp_min(increase(db_query_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__range]), 0)), 1)))",
           "instant": true,
           "range": false,
+          "format": "table",
           "refId": "A"
         }
       ],
       "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
         {
           "id": "organize",
           "options": {
@@ -204,8 +198,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "round(sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))) or vector(0)",
-          "range": true,
+          "expr": "round(sum(clamp_min(increase(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0))) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -250,8 +245,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "round(sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range]))) or vector(0)",
-          "range": true,
+          "expr": "round(sum(clamp_min(increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range]), 0))) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -312,8 +308,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "round(sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or vector(0)",
-          "range": true,
+          "expr": "round(sum(clamp_min(increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]), 0))) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -374,8 +371,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
-          "range": true,
+          "expr": "100 * (((sum(clamp_min(increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]), 0))) or vector(0)) / clamp_min((sum(clamp_min(increase(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0))), 1))",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -436,8 +434,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "range": true,
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -498,8 +497,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "range": true,
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -549,14 +549,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__interval]))",
+          "expr": "sum(clamp_min(increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__interval]), 0))",
           "legendFormat": "success",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__interval]))",
+          "expr": "sum(clamp_min(increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__interval]), 0))",
           "legendFormat": "error",
           "range": true,
           "refId": "B"
@@ -583,7 +583,7 @@
             "lineWidth": 2,
             "showPoints": "never"
           },
-          "unit": "s"
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -608,13 +608,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval])))",
-          "legendFormat": "{{job_name}} p95",
+          "expr": "1000 * (sum by (job_name) (clamp_min(increase(worker_job_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__interval]), 0)) / clamp_min(sum by (job_name) (clamp_min(increase(worker_job_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__interval]), 0)), 1))",
+          "legendFormat": "{{job_name}} avg",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Duration Tail By Job",
+      "title": "Duration Trend By Job (Avg ms)",
       "type": "timeseries",
       "description": "Which job types are slowing down."
     },
@@ -661,17 +661,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "round(sum by (job_name, job_status) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "expr": "round(sum by (job_name, job_status) (clamp_min(increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__range]), 0)))",
           "instant": true,
           "range": false,
+          "format": "table",
           "refId": "A"
         }
       ],
       "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
         {
           "id": "organize",
           "options": {
@@ -722,17 +719,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
+          "expr": "topk(15, 1000 * (sum by (job_name) (clamp_min(increase(worker_job_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__range]), 0)) / clamp_min(sum by (job_name) (clamp_min(increase(worker_job_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\"}[$__range]), 0)), 1)))",
           "instant": true,
           "range": false,
+          "format": "table",
           "refId": "A"
         }
       ],
       "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
         {
           "id": "organize",
           "options": {
@@ -742,13 +736,13 @@
             },
             "renameByName": {
               "job_name": "Job Name",
-              "Value": "P95",
-              "Value #A": "P95"
+              "Value": "Avg ms",
+              "Value #A": "Avg ms"
             }
           }
         }
       ],
-      "title": "Slow Jobs",
+      "title": "Slow Jobs (Avg ms)",
       "type": "table",
       "description": "Slow worker job classes."
     },
@@ -818,8 +812,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "round(sum(max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range]))) or vector(0)",
-          "range": true,
+          "expr": "round(sum(clamp_min(increase(db_query_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0))) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -880,8 +875,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "((sum(max_over_time(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])) / clamp_min(sum(max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])), 1))) or vector(0)",
-          "range": true,
+          "expr": "(1000 * (sum(clamp_min(increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0)) / clamp_min(sum(clamp_min(increase(db_query_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0)), 1))) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -942,8 +938,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "round((sum(max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])) / clamp_min(sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])), 1)), 0.01) or vector(0)",
-          "range": true,
+          "expr": "round((sum(clamp_min(increase(db_query_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0)) / clamp_min(sum(clamp_min(increase(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0)), 1)), 0.01) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -1004,8 +1001,9 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum(max_over_time(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range]))) or vector(0)",
-          "range": true,
+          "expr": "(1000 * sum(clamp_min(increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]), 0))) or vector(0)",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -1055,7 +1053,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",service_name=~\".*worker.*\"} |~ \"(?i)error|fatal|panic\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -1093,7 +1091,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",service_name=~\".*worker.*\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -1118,13 +1116,41 @@
         "current": {
           "selected": true,
           "text": "All",
+          "value": ".*worker.*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(worker_job_started_total{exported_job=~\".*worker.*\"}, exported_job)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Service",
+        "multi": false,
+        "name": "service",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(worker_job_started_total{exported_job=~\".*worker.*\"}, exported_job)",
+          "refId": "Var-service"
+        },
+        "refresh": 1,
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*worker.*",
+        "current": {
+          "selected": true,
+          "text": "All",
           "value": ".+"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(worker_job_started_total, deployment_environment_name)",
+        "definition": "label_values(worker_job_started_total{exported_job=~\".*worker.*\",exported_job=~\"$service\"}, deployment_environment_name)",
         "hide": 0,
         "includeAll": true,
         "label": "Environment",
@@ -1133,36 +1159,8 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(worker_job_started_total, deployment_environment_name)",
+          "query": "label_values(worker_job_started_total{exported_job=~\".*worker.*\",exported_job=~\"$service\"}, deployment_environment_name)",
           "refId": "Var-environment"
-        },
-        "refresh": 1,
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "allValue": null,
-        "current": {
-          "selected": true,
-          "text": "e2e-worker",
-          "value": "e2e-worker"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
-        "definition": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
-        "hide": 0,
-        "includeAll": false,
-        "label": "Service",
-        "multi": false,
-        "name": "service",
-        "options": [],
-        "query": {
-          "qryType": 1,
-          "query": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
-          "refId": "Var-service"
         },
         "refresh": 1,
         "skipUrlSync": false,

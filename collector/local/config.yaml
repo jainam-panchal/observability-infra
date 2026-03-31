@@ -44,10 +44,44 @@ receivers:
         type: move
         from: attributes.service
         to: resource["service.name"]
+        if: attributes.service != nil
       - id: app-environment-resource
         type: move
         from: attributes.deployment_environment
-        to: resource["deployment.environment"]
+        to: resource["deployment.environment.name"]
+        if: attributes.deployment_environment != nil
+      - id: app-environment-name-resource
+        type: move
+        from: attributes.deployment_environment_name
+        to: resource["deployment.environment.name"]
+        if: attributes.deployment_environment_name != nil
+
+  filelog/app:
+    include:
+      - /var/telemetry-logs/*.log
+    start_at: end
+    poll_interval: ${env:LOCAL_LOG_POLL_INTERVAL}
+    include_file_path: true
+    operators:
+      - id: app-log-json-parser
+        type: json_parser
+        parse_from: body
+        on_error: send_quiet
+      - id: app-service-resource-direct
+        type: move
+        from: attributes.service
+        to: resource["service.name"]
+        if: attributes.service != nil
+      - id: app-environment-resource-direct
+        type: move
+        from: attributes.deployment_environment
+        to: resource["deployment.environment.name"]
+        if: attributes.deployment_environment != nil
+      - id: app-environment-name-resource-direct
+        type: move
+        from: attributes.deployment_environment_name
+        to: resource["deployment.environment.name"]
+        if: attributes.deployment_environment_name != nil
 
 processors:
   memory_limiter:
@@ -57,9 +91,6 @@ processors:
 
   resource:
     attributes:
-      - key: deployment.environment
-        value: ${env:DEPLOYMENT_ENVIRONMENT}
-        action: upsert
       - key: host.name
         value: ${env:HOST_NAME}
         action: upsert
@@ -112,6 +143,7 @@ service:
     logs:
       receivers:
         - filelog
+        - filelog/app
       processors:
         - memory_limiter
         - resource

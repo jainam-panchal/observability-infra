@@ -26,7 +26,7 @@ processors:
     attributes:
       - action: insert
         key: loki.resource.labels
-        value: service.name,deployment.environment
+        value: service.name,deployment.environment.name
 
   batch/default:
     send_batch_size: 2048
