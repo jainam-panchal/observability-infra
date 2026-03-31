@@ -21,19 +21,14 @@
   "id": null,
   "links": [
     {
-      "title": "Service Performance",
+      "title": "API Debug",
       "type": "link",
       "url": "/d/service-performance/service-performance?var-environment=$environment&var-service=$service"
     },
     {
-      "title": "Background Processing",
+      "title": "Worker Debug",
       "type": "link",
-      "url": "/d/background-processing/background-processing?var-environment=$environment&var-service=$service"
-    },
-    {
-      "title": "System Health",
-      "type": "link",
-      "url": "/d/system-health/system-health"
+      "url": "/d/worker-debug/worker-debug?var-environment=$environment&var-service=$service"
     }
   ],
   "panels": [
@@ -572,7 +567,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Logs And Errors",
+  "title": "Logs & Errors",
   "uid": "logs-and-errors",
   "version": 1,
   "weekStart": ""

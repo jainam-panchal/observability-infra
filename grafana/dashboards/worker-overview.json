@@ -21,12 +21,12 @@
   "id": null,
   "links": [
     {
-      "title": "System Health",
+      "title": "API Debug",
       "type": "link",
-      "url": "/d/system-health/system-health"
+      "url": "/d/service-performance/service-performance?var-environment=$environment"
     },
     {
-      "title": "Logs And Errors",
+      "title": "Logs & Errors",
       "type": "link",
       "url": "/d/logs-and-errors/logs-and-errors?var-environment=$environment&var-service=$service"
     }
@@ -42,7 +42,7 @@
       },
       "id": 1,
       "panels": [],
-      "title": "Selected Worker",
+      "title": "Worker Incident Summary",
       "type": "row"
     },
     {
@@ -89,7 +89,7 @@
       ],
       "title": "Started",
       "type": "stat",
-      "description": "Observed job starts for the selected worker service."
+      "description": "Observed job starts for the selected worker."
     },
     {
       "datasource": {
@@ -135,7 +135,7 @@
       ],
       "title": "Completed",
       "type": "stat",
-      "description": "Successful job completions."
+      "description": "Successful worker completions."
     },
     {
       "datasource": {
@@ -197,7 +197,7 @@
       ],
       "title": "Failed",
       "type": "stat",
-      "description": "Real worker failures in the selected window."
+      "description": "Actual worker failures."
     },
     {
       "datasource": {
@@ -252,14 +252,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range])) ) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
+          "expr": "100 * (((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "Failure %",
       "type": "stat",
-      "description": "Failure rate for the selected worker service."
+      "description": "Failure rate for the selected worker."
     },
     {
       "datasource": {
@@ -321,7 +321,7 @@
       ],
       "title": "P95",
       "type": "stat",
-      "description": "Tail duration for worker jobs."
+      "description": "Tail job duration."
     },
     {
       "datasource": {
@@ -383,7 +383,7 @@
       ],
       "title": "P99",
       "type": "stat",
-      "description": "Worst-case worker latency."
+      "description": "Worst-case job duration."
     },
     {
       "datasource": {
@@ -442,7 +442,7 @@
       ],
       "title": "Job Completion Trend",
       "type": "timeseries",
-      "description": "Whether failures are bursty or sustained."
+      "description": "Burst vs sustained failure pattern."
     },
     {
       "datasource": {
@@ -506,7 +506,7 @@
       },
       "id": 10,
       "panels": [],
-      "title": "Job Debugging",
+      "title": "Worker Drilldown",
       "type": "row"
     },
     {
@@ -554,7 +554,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "job_name": "Job Name",
@@ -567,7 +568,7 @@
       ],
       "title": "Job Outcomes",
       "type": "table",
-      "description": "Which job classes are failing or succeeding."
+      "description": "Status distribution by job type."
     },
     {
       "datasource": {
@@ -614,7 +615,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "job_name": "Job Name",
@@ -626,7 +628,7 @@
       ],
       "title": "Slow Jobs",
       "type": "table",
-      "description": "Which job types are delayed."
+      "description": "Slow worker job classes."
     },
     {
       "collapsed": false,
@@ -638,83 +640,8 @@
       },
       "id": 13,
       "panels": [],
-      "title": "Fleet Triage",
+      "title": "DB Clues",
       "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 25
-      },
-      "id": 14,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__range])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "C"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "scope": "Target",
-              "Value": "Started",
-              "Value #A": "Started",
-              "Value #B": "Failed",
-              "Value #C": "P95"
-            }
-          }
-        }
-      ],
-      "title": "Fleet Summary",
-      "type": "table",
-      "description": "Compact fleet triage. Use it to scan other worker services."
     },
     {
       "datasource": {
@@ -726,17 +653,33 @@
           "color": {
             "mode": "background"
           },
-          "unit": "none"
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 10,
+                "color": "red"
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
-        "w": 24,
+        "w": 6,
         "x": 0,
-        "y": 33
+        "y": 25
       },
-      "id": 15,
+      "id": 16,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -753,14 +696,281 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "vector(0)",
+          "expr": "sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Phase-Two Signals",
+      "title": "DB Queries",
       "type": "stat",
-      "description": "Retry pressure, queue depth, and stuck-job age remain deferred until first-class metrics exist."
+      "description": "DB operations observed while the worker ran."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 150,
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 25
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "((sum(increase(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) / clamp_min(sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])), 1))) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "DB Avg Query Time",
+      "type": "stat",
+      "description": "Average DB query time for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 5,
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 25
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(db_sql_connection_wait_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "DB Wait Events",
+      "type": "stat",
+      "description": "Connection waits during worker execution."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 200,
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 25
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(db_sql_connection_wait_duration_milliseconds_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "DB Wait Time",
+      "type": "stat",
+      "description": "Total time workers spent waiting on DB connections."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Worker Logs",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 30
+      },
+      "id": 14,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Worker Error Logs",
+      "type": "logs",
+      "description": "Current worker failure stream."
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 30
+      },
+      "id": 15,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Worker Logs",
+      "type": "logs",
+      "description": "Worker context logs."
     }
   ],
   "refresh": "10s",
@@ -837,8 +1047,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Background Processing",
-  "uid": "background-processing",
+  "title": "Worker Debug",
+  "uid": "worker-debug",
   "version": 1,
   "weekStart": ""
 }

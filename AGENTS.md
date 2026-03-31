@@ -84,19 +84,19 @@ Checklist rule:
 - current dashboard metric contract to preserve unless the shared package changes:
   - the central Prometheus exporter must keep `resource_to_telemetry_conversion.enabled: true` so application resource attributes such as `deployment.environment` become queryable metric labels; the current exported Prometheus label name is `deployment_environment_name`
   - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, `http_server_active_requests`, and outbound `http_client_request_duration_seconds_*`
-  - `service-overview.json` is now the single production API board, titled `Service Performance`; it combines fleet triage, selected-service debugging, endpoint drilldown, and dependency impact in one dashboard
-  - aggregate service panels must surface both `deployment_environment_name` and `exported_job`; do not ship multi-service views that collapse away environment/service attribution
-  - service endpoint drilldown must use stable instant tables such as endpoint volume, top 5xx endpoints, and slow endpoints; do not reintroduce fragile merged multi-query route tables
+  - `service-overview.json` is now the primary API incident console, titled `API Debug`; keep it selected-service-first rather than fleet-first
+  - the API dashboard must stay HTTP-first: requests, 4xx, 5xx, p95/p99, route failure surfacing, dependency clues, DB clues, and service logs belong together on one page
+  - service endpoint drilldown must use stable instant tables such as the heaviest endpoints, top 4xx/5xx endpoints, and slow endpoints; do not reintroduce fragile merged multi-query route tables
   - service dependency panels must group by `server_address` from outbound HTTP client metrics when those metrics are present
+  - DB panels on the API dashboard must stay honest to emitted telemetry; use query count, average latency, wait events, and wait time where DB metrics exist, and do not fake per-query or per-endpoint DB attribution that the current metrics do not support
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
-  - `worker-overview.json` is now the single production async board, titled `Background Processing`; it combines fleet triage, selected-worker debugging, and job drilldown in one dashboard
-  - aggregate worker panels must surface both `deployment_environment_name` and `exported_job`; do not ship multi-service worker views that hide which environment or service produced a series
+  - `worker-overview.json` is now the primary async incident console, titled `Worker Debug`; keep it selected-worker-first rather than fleet-first
   - worker drilldown must use stable instant tables such as job outcomes and slow jobs; do not reintroduce merged multi-query job tables
+  - worker DB clue panels should use the same honest metric family as the API board: query count, average latency, wait events, and wait time
   - sparse worker dashboards in this pilot must prefer `max_over_time(...)` over `increase(...)` for counters and histogram buckets because one-shot workers may only be scraped once; `increase(...)` collapses to `0` and histogram quantiles become `NaN`
-  - `platform-health.json` is now the single production system board, titled `System Health`; it must stay focused on availability, resource pressure, telemetry pipeline health, and infra-to-service correlation rather than application route/job detail
-  - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, `process_cpu_seconds_total`, `process_network_*`, and `otelcol_process_*`
-  - `logs-and-traces-drilldown.json` is now the single production logs board, titled `Logs And Errors`; it uses `environment`, `service`, and `level`, and must keep visible log context concise and non-duplicated
-  - keep the production dashboard set minimal and stable: `service-overview.json`, `worker-overview.json`, `platform-health.json`, and `logs-and-traces-drilldown.json`
+  - there is no standalone `System Health` dashboard in the current minimal incident set; do not reintroduce one unless the stack gains real host-level metrics and host-log ingestion
+  - `logs-and-traces-drilldown.json` is now the single production logs board, titled `Logs & Errors`; it uses `environment`, `service`, and `level`, and must keep visible log context concise and non-duplicated
+  - keep the production dashboard set minimal and stable: `service-overview.json`, `worker-overview.json`, and `logs-and-traces-drilldown.json`
   - Grafana logs dashboards that use Loki metric queries must use non-empty `All` regex values such as `.+`; Loki rejects empty-compatible matchers like `=~".*"` in metric-style queries
   - do not use `skipUrlSync: true` on primary Grafana filters such as `environment`, `service`, `route`, and `job_name`; drilldown state must persist across reloads and time-range changes
   - do not ship custom Grafana variables with `includeAll: false` while `current` is set to `All`; either enable `All` explicitly or set a concrete default

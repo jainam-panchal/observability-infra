@@ -21,12 +21,12 @@
   "id": null,
   "links": [
     {
-      "title": "System Health",
+      "title": "Worker Debug",
       "type": "link",
-      "url": "/d/system-health/system-health"
+      "url": "/d/worker-debug/worker-debug?var-environment=$environment"
     },
     {
-      "title": "Logs And Errors",
+      "title": "Logs & Errors",
       "type": "link",
       "url": "/d/logs-and-errors/logs-and-errors?var-environment=$environment&var-service=$service"
     }
@@ -42,7 +42,7 @@
       },
       "id": 1,
       "panels": [],
-      "title": "Selected Service",
+      "title": "API Incident Summary",
       "type": "row"
     },
     {
@@ -89,7 +89,7 @@
       ],
       "title": "Requests",
       "type": "stat",
-      "description": "Total API requests for the selected service in the visible window."
+      "description": "Total HTTP requests for the selected API."
     },
     {
       "datasource": {
@@ -151,7 +151,7 @@
       ],
       "title": "4xx",
       "type": "stat",
-      "description": "Where validation, auth, and client misuse are landing."
+      "description": "Validation, auth, or client misuse responses."
     },
     {
       "datasource": {
@@ -213,7 +213,7 @@
       ],
       "title": "5xx",
       "type": "stat",
-      "description": "Where the service is actually breaking."
+      "description": "Actual backend/server failures."
     },
     {
       "datasource": {
@@ -275,7 +275,7 @@
       ],
       "title": "P95",
       "type": "stat",
-      "description": "Tail latency across the selected window."
+      "description": "Tail latency seen by callers."
     },
     {
       "datasource": {
@@ -337,7 +337,7 @@
       ],
       "title": "P99",
       "type": "stat",
-      "description": "Worst-case user experience signal."
+      "description": "Worst-case latency signal."
     },
     {
       "datasource": {
@@ -465,7 +465,7 @@
       ],
       "title": "Request Rate By Status Family",
       "type": "timeseries",
-      "description": "Shows whether the problem is client-side noise or server-side breakage."
+      "description": "Tells you whether the pain is client-side or server-side."
     },
     {
       "datasource": {
@@ -524,7 +524,7 @@
       ],
       "title": "Tail Latency By Method",
       "type": "timeseries",
-      "description": "API-level latency split by method."
+      "description": "Deep HTTP-layer latency split."
     },
     {
       "datasource": {
@@ -576,7 +576,7 @@
       ],
       "title": "Downstream Dependency Latency",
       "type": "timeseries",
-      "description": "Dependency latency over the selected window, which is more stable for sparse outbound traffic."
+      "description": "Whether the API is slow because a downstream is slow."
     },
     {
       "collapsed": false,
@@ -588,7 +588,7 @@
       },
       "id": 11,
       "panels": [],
-      "title": "Endpoint Debugging",
+      "title": "API Drilldown",
       "type": "row"
     },
     {
@@ -636,7 +636,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "http_request_method": "Method",
@@ -647,9 +648,9 @@
           }
         }
       ],
-      "title": "Hot Endpoints",
+      "title": "Heaviest Endpoints",
       "type": "table",
-      "description": "Where the API is actually receiving traffic."
+      "description": "The busiest API routes in the selected window."
     },
     {
       "datasource": {
@@ -696,7 +697,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "http_request_method": "Method",
@@ -709,7 +711,7 @@
       ],
       "title": "Validation / Client Error Endpoints",
       "type": "table",
-      "description": "Which routes are producing validation/auth/client errors."
+      "description": "Routes where validation/auth/client errors are hitting."
     },
     {
       "datasource": {
@@ -756,7 +758,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "http_request_method": "Method",
@@ -769,7 +772,7 @@
       ],
       "title": "Server Error Endpoints",
       "type": "table",
-      "description": "Which routes are actually breaking server-side."
+      "description": "Routes where the backend is actually failing."
     },
     {
       "datasource": {
@@ -816,7 +819,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "http_request_method": "Method",
@@ -829,7 +833,7 @@
       ],
       "title": "Slow Endpoints",
       "type": "table",
-      "description": "Tail latency outliers by endpoint."
+      "description": "Latency outliers by endpoint."
     },
     {
       "datasource": {
@@ -876,7 +880,8 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "server_address": "Dependency",
@@ -888,7 +893,7 @@
       ],
       "title": "Dependency Error Surface",
       "type": "table",
-      "description": "Dependency non-success ratio over the selected window."
+      "description": "Which downstream is contributing non-success responses."
     },
     {
       "collapsed": false,
@@ -900,7 +905,7 @@
       },
       "id": 17,
       "panels": [],
-      "title": "Fleet Triage",
+      "title": "DB Clues",
       "type": "row"
     },
     {
@@ -911,72 +916,326 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "background"
+          },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 10,
+                "color": "red"
+              }
+            ]
           }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
+        "h": 4,
+        "w": 6,
         "x": 0,
         "y": 35
       },
-      "id": 18,
+      "id": 20,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "showHeader": true
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
+          "expr": "sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "range": true,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
-          "instant": true,
-          "range": false,
-          "refId": "C"
         }
       ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "scope": "Target",
-              "Value": "Request Rate",
-              "Value #A": "Request Rate",
-              "Value #B": "5xx %",
-              "Value #C": "P95"
-            }
+      "title": "DB Queries",
+      "type": "stat",
+      "description": "DB operations observed for this service. Zero means the service is not exporting DB metrics or did not touch the DB in the selected window."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 150,
+                "color": "red"
+              }
+            ]
           }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 35
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "((sum(increase(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) / clamp_min(sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])), 1))) or vector(0)",
+          "range": true,
+          "refId": "A"
         }
       ],
-      "title": "Fleet Summary",
-      "type": "table",
-      "description": "Compact fleet triage. Use it to jump between services."
+      "title": "DB Avg Query Time",
+      "type": "stat",
+      "description": "Average DB query time. Use this with endpoint latency to judge whether the DB is contributing to the incident."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 5,
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 35
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(db_sql_connection_wait_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "DB Wait Events",
+      "type": "stat",
+      "description": "Connection-pool waits. If this climbs during latency or 5xx spikes, DB saturation is a likely part of the story."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 200,
+                "color": "red"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 35
+      },
+      "id": 23,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(db_sql_connection_wait_duration_milliseconds_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "DB Wait Time",
+      "type": "stat",
+      "description": "Total time spent waiting for DB connections in the selected window."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "id": 17,
+      "panels": [],
+      "title": "API Logs",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 41
+      },
+      "id": 18,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent API Error Logs",
+      "type": "logs",
+      "description": "Error stream for the selected API."
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 41
+      },
+      "id": 19,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent API Logs",
+      "type": "logs",
+      "description": "General context around the incident."
     }
   ],
   "refresh": "10s",
@@ -984,7 +1243,7 @@
   "style": "dark",
   "tags": [
     "observability",
-    "service",
+    "api",
     "production"
   ],
   "templating": {
@@ -1053,7 +1312,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Service Performance",
+  "title": "API Debug",
   "uid": "service-performance",
   "version": 1,
   "weekStart": ""
