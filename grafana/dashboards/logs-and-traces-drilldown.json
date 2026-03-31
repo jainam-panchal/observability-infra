@@ -411,10 +411,10 @@
           "value": ".+"
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
+          "type": "loki",
+          "uid": "loki"
         },
-        "definition": "label_values(http_server_request_count_total, deployment_environment_name)",
+        "definition": "label_values({deployment_environment=~\".+\"}, deployment_environment)",
         "hide": 0,
         "includeAll": true,
         "label": "Environment",
@@ -422,9 +422,11 @@
         "name": "environment",
         "options": [],
         "query": {
-          "qryType": 1,
-          "query": "label_values(http_server_request_count_total, deployment_environment_name)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          "label": "deployment_environment",
+          "query": "label_values({deployment_environment=~\".+\"}, deployment_environment)",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "{deployment_environment=~\".+\"}",
+          "type": 1
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -439,10 +441,10 @@
           "value": ".+"
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
+          "type": "loki",
+          "uid": "loki"
         },
-        "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
+        "definition": "label_values({deployment_environment=~\"${environment:raw}\"}, service_name)",
         "hide": 0,
         "includeAll": true,
         "label": "Service",
@@ -450,9 +452,11 @@
         "name": "service",
         "options": [],
         "query": {
-          "qryType": 1,
-          "query": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          "label": "service_name",
+          "query": "label_values({deployment_environment=~\"${environment:raw}\"}, service_name)",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "{deployment_environment=~\"${environment:raw}\"}",
+          "type": 1
         },
         "refresh": 1,
         "skipUrlSync": false,
