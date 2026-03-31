@@ -35,34 +35,50 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 10,
+        "w": 24,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
+        "showHeader": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job) (up{job=~\"central-otel-collector-self|prometheus\"})",
-          "legendFormat": "{{job}}",
-          "range": true,
+          "expr": "up{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Critical Scrape Target Health",
-      "type": "timeseries"
+      "title": "Critical Target Health",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "job": "Job",
+              "instance": "Instance",
+              "Value": "Up",
+              "Value #A": "Up"
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
@@ -80,39 +96,39 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
+        "w": 8,
+        "x": 0,
+        "y": 10
       },
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (exporter) (rate(otelcol_exporter_sent_spans[5m])) or vector(0)",
-          "legendFormat": "{{exporter}} sent spans/sec",
+          "expr": "sum by (exporter) (rate(otelcol_exporter_sent_spans[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{exporter}} sent",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "sum by (exporter) (rate(otelcol_exporter_send_failed_spans[5m])) or vector(0)",
-          "legendFormat": "{{exporter}} failed spans/sec",
+          "expr": "sum by (exporter) (rate(otelcol_exporter_send_failed_spans[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{exporter}} failed",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Trace Export Success and Failure",
+      "title": "Trace Export Health",
       "type": "timeseries"
     },
     {
@@ -131,39 +147,39 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
+        "w": 8,
+        "x": 8,
+        "y": 10
       },
       "id": 3,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (exporter) (rate(otelcol_exporter_sent_metric_points[5m])) or vector(0)",
-          "legendFormat": "{{exporter}} sent metric points/sec",
+          "expr": "sum by (exporter) (rate(otelcol_exporter_sent_metric_points[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{exporter}} sent",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "sum by (exporter) (rate(otelcol_exporter_send_failed_metric_points[5m])) or vector(0)",
-          "legendFormat": "{{exporter}} failed metric points/sec",
+          "expr": "sum by (exporter) (rate(otelcol_exporter_send_failed_metric_points[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{exporter}} failed",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Metric Export Success and Failure",
+      "title": "Metric Export Health",
       "type": "timeseries"
     },
     {
@@ -182,39 +198,39 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
+        "w": 8,
+        "x": 16,
+        "y": 10
       },
       "id": 4,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (exporter) (rate(otelcol_exporter_sent_log_records[5m])) or vector(0)",
-          "legendFormat": "{{exporter}} sent logs/sec",
+          "expr": "sum by (exporter) (rate(otelcol_exporter_sent_log_records[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{exporter}} sent",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "sum by (exporter) (rate(otelcol_exporter_send_failed_log_records[5m])) or vector(0)",
-          "legendFormat": "{{exporter}} failed logs/sec",
+          "expr": "sum by (exporter) (rate(otelcol_exporter_send_failed_log_records[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{exporter}} failed",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Log Export Success and Failure",
+      "title": "Log Export Health",
       "type": "timeseries"
     },
     {
@@ -234,14 +250,14 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 16
+        "y": 18
       },
       "id": 5,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
@@ -257,7 +273,7 @@
           "refId": "A"
         }
       ],
-      "title": "Collector Queue Depth",
+      "title": "Queue Depth",
       "type": "timeseries"
     },
     {
@@ -277,14 +293,14 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 16
+        "y": 18
       },
       "id": 6,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
@@ -294,27 +310,27 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (processor) (rate(otelcol_processor_dropped_spans[5m])) or vector(0)",
-          "legendFormat": "{{processor}} dropped spans/sec",
+          "expr": "sum by (processor) (rate(otelcol_processor_dropped_spans[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{processor}} spans",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "sum by (processor) (rate(otelcol_processor_dropped_metric_points[5m])) or vector(0)",
-          "legendFormat": "{{processor}} dropped metric points/sec",
+          "expr": "sum by (processor) (rate(otelcol_processor_dropped_metric_points[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{processor}} metrics",
           "range": true,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "sum by (processor) (rate(otelcol_processor_dropped_log_records[5m])) or vector(0)",
-          "legendFormat": "{{processor}} dropped logs/sec",
+          "expr": "sum by (processor) (rate(otelcol_processor_dropped_log_records[$__rate_interval])) or vector(0)",
+          "legendFormat": "{{processor}} logs",
           "range": true,
           "refId": "C"
         }
       ],
-      "title": "Dropped Telemetry by Signal",
+      "title": "Dropped Telemetry",
       "type": "timeseries"
     },
     {
@@ -335,30 +351,30 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 24
+        "y": 26
       },
       "id": 7,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "process_resident_memory_bytes{job=~\"central-otel-collector-self|prometheus\"}",
+          "expr": "process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\"}",
           "legendFormat": "{{job}} / {{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Collector and Prometheus Memory",
+      "title": "Memory By Component",
       "type": "timeseries"
     },
     {
@@ -379,89 +395,31 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 24
+        "y": 26
       },
       "id": 8,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(process_cpu_time_seconds_total{job=~\"central-otel-collector-self|prometheus\"}[5m])",
+          "expr": "rate(process_cpu_time_seconds_total{job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
           "legendFormat": "{{job}} / {{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Collector and Prometheus CPU",
+      "title": "CPU By Component",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 32
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "up",
-          "legendFormat": "{{job}} / {{instance}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Prometheus Scrape Target Health",
-      "type": "timeseries"
-    },
-    {
-      "gridPos": {
-        "h": 7,
-        "w": 24,
-        "x": 0,
-        "y": 40
-      },
-      "id": 10,
-      "options": {
-        "content": "Node-level central-host CPU, memory, and disk panels are deferred until host metrics are added. Loki and Tempo backend-internal ingestion panels are also deferred until self-metrics are explicitly enabled and documented.",
-        "mode": "markdown"
-      },
-      "title": "Deferred Platform Panels",
-      "type": "text"
     }
   ],
   "refresh": "30s",
@@ -474,10 +432,11 @@
   "templating": {
     "list": [
       {
+        "allValue": ".+",
         "current": {
           "selected": true,
-          "text": ".*",
-          "value": ".*"
+          "text": "All",
+          "value": ".+"
         },
         "datasource": {
           "type": "prometheus",
@@ -487,24 +446,25 @@
         "hide": 0,
         "includeAll": true,
         "label": "Job",
-        "multi": true,
+        "multi": false,
         "name": "job",
         "options": [],
         "query": {
+          "qryType": 1,
           "query": "label_values(up, job)",
           "refId": "Prometheus-job"
         },
         "refresh": 1,
-        "regex": "",
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
       {
+        "allValue": ".+",
         "current": {
           "selected": true,
-          "text": ".*",
-          "value": ".*"
+          "text": "All",
+          "value": ".+"
         },
         "datasource": {
           "type": "prometheus",
@@ -514,15 +474,15 @@
         "hide": 0,
         "includeAll": true,
         "label": "Instance",
-        "multi": true,
+        "multi": false,
         "name": "instance",
         "options": [],
         "query": {
+          "qryType": 1,
           "query": "label_values(up{job=~\"$job\"}, instance)",
           "refId": "Prometheus-instance"
         },
         "refresh": 1,
-        "regex": "",
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
@@ -537,6 +497,6 @@
   "timezone": "",
   "title": "Observability Platform Health",
   "uid": "platform-health",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

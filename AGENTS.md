@@ -85,15 +85,19 @@ Checklist rule:
   - the central Prometheus exporter must keep `resource_to_telemetry_conversion.enabled: true` so application resource attributes such as `deployment.environment` become queryable metric labels; the current exported Prometheus label name is `deployment_environment_name`
   - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, and `http_server_active_requests`
   - `service-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
+  - the production service dashboard set is two-level by intent: `service-overview.json` for fleet triage and `service-detail.json` for selected-service drilldown; do not collapse them into one noisy board
   - aggregate service panels must surface both `deployment_environment_name` and `exported_job`; do not ship multi-service fleet views that collapse away environment/service attribution
   - `service-detail.json` is the backend debugging board and must use only `environment` and `service` as top-level filters; route and method breakdown belongs inside panels and tables, not as primary dashboard selectors
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
   - `worker-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
+  - the production worker dashboard set is two-level by intent: `worker-overview.json` for fleet triage and `worker-detail.json` for selected-worker drilldown; do not mix fleet and job-type detail into the same row
   - aggregate worker panels must surface both `deployment_environment_name` and `exported_job`; do not ship multi-service worker views that hide which environment or service produced a series
   - `worker-detail.json` is the backend worker debugging board and must use only `environment` and `service` as top-level filters; job-name breakdown belongs inside panels and tables, not as a primary dashboard selector
   - sparse worker dashboards in this pilot must prefer `max_over_time(...)` over `increase(...)` for counters and histogram buckets because one-shot workers may only be scraped once; `increase(...)` collapses to `0` and histogram quantiles become `NaN`
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
   - `logs-and-traces-drilldown.json` is the dedicated logs investigation board and uses `environment`, `service`, and `level`; keep logs out of service and worker dashboards until live Loki ingestion is verified
+  - `platform-health.json` is the system overview board; it must stay focused on availability, pipeline health, queue pressure, dropped telemetry, and resource usage rather than application route/job detail
+  - keep the production dashboard set minimal and stable: `service-overview.json`, `service-detail.json`, `worker-overview.json`, `worker-detail.json`, `platform-health.json`, and `logs-and-traces-drilldown.json`
   - Grafana logs dashboards that use Loki metric queries must use non-empty `All` regex values such as `.+`; Loki rejects empty-compatible matchers like `=~".*"` in metric-style queries
   - do not use `skipUrlSync: true` on primary Grafana filters such as `environment`, `service`, `route`, and `job_name`; drilldown state must persist across reloads and time-range changes
   - do not ship custom Grafana variables with `includeAll: false` while `current` is set to `All`; either enable `All` explicitly or set a concrete default
