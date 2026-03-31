@@ -440,7 +440,7 @@
       },
       "gridPos": {
         "h": 12,
-        "w": 24,
+        "w": 12,
         "x": 0,
         "y": 12
       },
@@ -455,55 +455,16 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
+          "expr": "sum by (http_request_method, http_route, http_response_status_code) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
           "instant": true,
           "range": false,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__range])) or vector(0)",
-          "instant": true,
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "expr": "sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])) or vector(0)",
-          "instant": true,
-          "range": false,
-          "refId": "C"
-        },
-        {
-          "editorMode": "code",
-          "expr": "100 * ((sum by (http_request_method, http_route) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval])) or on() vector(0)) / clamp_min(sum by (http_request_method, http_route) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])), 1))",
-          "instant": true,
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, http_request_method, http_route) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "instant": true,
-          "range": false,
-          "refId": "E"
-        },
-        {
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, http_request_method, http_route) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "instant": true,
-          "range": false,
-          "refId": "F"
         }
       ],
-      "title": "Route Drilldown",
+      "title": "Route Requests By Status",
       "transformations": [
         {
           "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "merge",
           "options": {}
         },
         {
@@ -515,13 +476,68 @@
             "renameByName": {
               "http_request_method": "Method",
               "http_route": "Route",
+              "http_response_status_code": "Status",
               "Value": "Requests",
-              "Value #A": "Requests",
-              "Value #B": "4xx",
-              "Value #C": "5xx",
-              "Value #D": "Error %",
-              "Value #E": "P95",
-              "Value #F": "P99"
+              "Value #A": "Requests"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le, http_request_method, http_route) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Slow Routes",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "http_request_method": "Method",
+              "http_route": "Route",
+              "Value": "P95",
+              "Value #A": "P95"
             }
           }
         }
