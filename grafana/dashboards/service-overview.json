@@ -97,42 +97,42 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"4..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "C"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "D"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "E"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (http_server_active_requests{deployment_environment_name=~\"$environment\"})), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "F"
@@ -166,7 +166,7 @@
       ],
       "title": "Service Summary",
       "type": "table",
-      "description": "Summary view with one combined target column instead of repeating environment and service."
+      "description": "Fleet summary across services in the selected environment. Pick a concrete service for the focused section below."
     },
     {
       "collapsed": false,
@@ -223,7 +223,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))",
+          "expr": "sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
@@ -275,14 +275,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), 1))",
+          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"4..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}} 4xx",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))), 1))",
+          "expr": "100 * (((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",http_response_status_code=~\"5..\"}[$__rate_interval]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\"}[$__rate_interval]))), 1))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}} 5xx",
           "range": true,
           "refId": "B"
@@ -334,14 +334,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}} p95",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (rate(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__rate_interval])))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}} p99",
           "range": true,
           "refId": "B"
@@ -407,7 +407,8 @@
         }
       ],
       "title": "Requests",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -452,7 +453,8 @@
         }
       ],
       "title": "4xx",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -513,7 +515,8 @@
         }
       ],
       "title": "5xx",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -558,7 +561,8 @@
         }
       ],
       "title": "P95",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -603,7 +607,8 @@
         }
       ],
       "title": "P99",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -648,7 +653,8 @@
         }
       ],
       "title": "Active",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -714,7 +720,7 @@
       ],
       "title": "Request Rate By Status Family",
       "type": "timeseries",
-      "description": "How the selected service is failing right now."
+      "description": "How the selected service is failing right now. Uses the selected service only."
     },
     {
       "datasource": {
@@ -766,7 +772,7 @@
       ],
       "title": "Latency By Method",
       "type": "timeseries",
-      "description": "Find whether one verb shape is driving tail latency."
+      "description": "Find whether one verb shape is driving tail latency. Uses the selected service only."
     },
     {
       "collapsed": false,
@@ -839,7 +845,7 @@
       ],
       "title": "Endpoint Volume",
       "type": "table",
-      "description": "What endpoints are hottest in the selected window."
+      "description": "What endpoints are hottest in the selected window. Uses the selected service only."
     },
     {
       "datasource": {
@@ -899,7 +905,7 @@
       ],
       "title": "Top 5xx Endpoints",
       "type": "table",
-      "description": "Exactly where server-side failures are concentrated."
+      "description": "Exactly where server-side failures are concentrated. Uses the selected service only."
     },
     {
       "datasource": {
@@ -959,7 +965,7 @@
       ],
       "title": "Slow Endpoints",
       "type": "table",
-      "description": "Tail latency outliers by route."
+      "description": "Tail latency outliers by route. Uses the selected service only."
     },
     {
       "collapsed": false,
@@ -1024,7 +1030,7 @@
       ],
       "title": "Downstream Request Rate By Dependency",
       "type": "timeseries",
-      "description": "Which downstreams are active while this service is failing."
+      "description": "Which downstreams are active while this service is failing. Uses the selected service only."
     },
     {
       "datasource": {
@@ -1076,7 +1082,7 @@
       ],
       "title": "Downstream Tail Latency",
       "type": "timeseries",
-      "description": "Whether dependency latency is driving service latency."
+      "description": "Whether dependency latency is driving service latency. Uses the selected service only."
     },
     {
       "datasource": {
@@ -1135,7 +1141,7 @@
       ],
       "title": "Dependency Non-2xx Rate",
       "type": "table",
-      "description": "Blast radius across downstream dependencies."
+      "description": "Blast radius across downstream dependencies. Uses the selected service only."
     }
   ],
   "refresh": "10s",
@@ -1177,11 +1183,11 @@
         "type": "query"
       },
       {
-        "allValue": ".+",
+        "allValue": null,
         "current": {
           "selected": true,
-          "text": "All",
-          "value": ".+"
+          "text": "e2e-api",
+          "value": "e2e-api"
         },
         "datasource": {
           "type": "prometheus",
@@ -1189,7 +1195,7 @@
         },
         "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Service",
         "multi": false,
         "name": "service",

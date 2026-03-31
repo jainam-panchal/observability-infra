@@ -97,42 +97,42 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"success|ok|completed\"}[$__range]))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__range])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "C"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((100 * (((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__range]))) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))))) / clamp_min((sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__range]))), 1))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "D"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__range])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "E"
         },
         {
           "editorMode": "code",
-          "expr": "label_join(label_join((histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
+          "expr": "label_join(label_join((histogram_quantile(0.99, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__range])))), \"scope\", \"\", \"deployment_environment_name\"), \"scope\", \" / \", \"scope\", \"exported_job\")",
           "instant": true,
           "range": false,
           "refId": "F"
@@ -166,7 +166,7 @@
       ],
       "title": "Worker Summary",
       "type": "table",
-      "description": "Summary view with one combined target column instead of repeating environment and service."
+      "description": "Fleet summary across worker services in the selected environment. Pick a concrete service for the focused section below."
     },
     {
       "collapsed": false,
@@ -223,7 +223,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))))",
+          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__interval]))))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
@@ -275,7 +275,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))))",
+          "expr": "sum by (deployment_environment_name, exported_job) (increase(worker_job_completed_total{deployment_environment_name=~\"$environment\",job_status=~\"error|failed\"}[$__interval])) or on (deployment_environment_name, exported_job) (0 * (sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\"}[$__interval]))))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
@@ -327,7 +327,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\"}[$__interval])))",
           "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
@@ -393,7 +393,8 @@
         }
       ],
       "title": "Started",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -438,7 +439,8 @@
         }
       ],
       "title": "Completed",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -499,7 +501,8 @@
         }
       ],
       "title": "Failed",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -544,7 +547,8 @@
         }
       ],
       "title": "Failure %",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -589,7 +593,8 @@
         }
       ],
       "title": "P95",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -634,7 +639,8 @@
         }
       ],
       "title": "P99",
-      "type": "stat"
+      "type": "stat",
+      "description": "Uses the selected service only."
     },
     {
       "datasource": {
@@ -693,7 +699,7 @@
       ],
       "title": "Completion Trend By Status",
       "type": "timeseries",
-      "description": "Are failures isolated or sustained."
+      "description": "Are failures isolated or sustained. Uses the selected service only."
     },
     {
       "datasource": {
@@ -745,7 +751,7 @@
       ],
       "title": "Duration Tail By Job",
       "type": "timeseries",
-      "description": "Which job types are slowing down."
+      "description": "Which job types are slowing down. Uses the selected service only."
     },
     {
       "collapsed": false,
@@ -818,7 +824,7 @@
       ],
       "title": "Job Outcomes",
       "type": "table",
-      "description": "Which job classes are failing."
+      "description": "Which job classes are failing. Uses the selected service only."
     },
     {
       "datasource": {
@@ -877,7 +883,7 @@
       ],
       "title": "Slow Jobs",
       "type": "table",
-      "description": "Which job types are delayed."
+      "description": "Which job types are delayed. Uses the selected service only."
     },
     {
       "collapsed": false,
@@ -951,11 +957,11 @@
         "type": "query"
       },
       {
-        "allValue": ".+",
+        "allValue": null,
         "current": {
           "selected": true,
-          "text": "All",
-          "value": ".+"
+          "text": "e2e-worker",
+          "value": "e2e-worker"
         },
         "datasource": {
           "type": "prometheus",
@@ -963,7 +969,7 @@
         },
         "definition": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Service",
         "multi": false,
         "name": "service",
