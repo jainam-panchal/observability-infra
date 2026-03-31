@@ -82,7 +82,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
+          "expr": "round(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
           "range": true,
           "refId": "A"
         }
@@ -144,7 +144,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__range])) or vector(0)",
+          "expr": "round(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -206,7 +206,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])) or vector(0)",
+          "expr": "round(sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -392,12 +392,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
+          "expr": "max_over_time(sum(http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})[$__range:]) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Active",
+      "title": "Peak In-Flight",
       "type": "stat",
       "description": "Current in-flight request pressure."
     },
@@ -581,7 +581,7 @@
       },
       "id": 11,
       "panels": [],
-      "title": "API Drilldown",
+      "title": "Endpoint Drilldown",
       "type": "row"
     },
     {
@@ -614,7 +614,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "expr": "topk(15, round(sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -675,7 +675,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__range])))",
+          "expr": "topk(15, round(sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"4..\"}[$__range]))))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -736,7 +736,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])))",
+          "expr": "topk(15, round(sum by (http_request_method, http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range]))))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -899,7 +899,7 @@
       },
       "id": 17,
       "panels": [],
-      "title": "DB Signals",
+      "title": "Database",
       "type": "row"
     },
     {
@@ -955,14 +955,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "expr": "round(sum(increase(db_query_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "DB Query Volume",
+      "title": "DB Queries In Range",
       "type": "stat",
-      "description": "DB operations observed for this service. If this stays zero, route-level DB attribution is not available from this service yet."
+      "description": "Total DB queries attributed to the selected service in the selected window."
     },
     {
       "datasource": {
@@ -1017,7 +1017,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "((sum(increase(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) / clamp_min(sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])), 1))) or vector(0)",
+          "expr": "(1000 * (sum(increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])) / clamp_min(sum(increase(db_query_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])), 1))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -1025,6 +1025,249 @@
       "title": "DB Avg Query Time",
       "type": "stat",
       "description": "Average DB query time. Use this with endpoint latency to judge whether the DB is contributing to the incident."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 39
+      },
+      "id": 22,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, round(sum by (http_route) (increase(db_query_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range]))))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "http_route": "Route",
+              "Value": "DB Queries",
+              "Value #A": "DB Queries"
+            }
+          }
+        }
+      ],
+      "title": "DB-Heavy Endpoints",
+      "type": "table",
+      "description": "Route-level DB volume once the service emits route-aware DB metrics."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 39
+      },
+      "id": 23,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, histogram_quantile(0.95, sum by (le, http_route) (increase(db_query_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range]))))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "http_route": "Route",
+              "Value": "DB P95",
+              "Value #A": "DB P95"
+            }
+          }
+        }
+      ],
+      "title": "Slow DB Endpoints",
+      "type": "table",
+      "description": "Routes whose DB work is slow once route-aware DB metrics are present."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 47
+      },
+      "id": 27,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, round((sum by (http_route) (increase(db_query_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])) / clamp_min(sum by (http_route) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])), 1)), 0.01))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "http_route": "Route",
+              "Value": "DB Queries / Req",
+              "Value #A": "DB Queries / Req"
+            }
+          }
+        }
+      ],
+      "title": "DB Queries / Request By Endpoint",
+      "type": "table",
+      "description": "Endpoints that fan out into the most DB work per request."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 47
+      },
+      "id": 28,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, 100 * ((sum by (http_route) (increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range]))) / clamp_min(sum by (http_route) (increase(http_server_request_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])), 1e-9)))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "http_route": "Route",
+              "Value": "DB Time Share %",
+              "Value #A": "DB Time Share %"
+            }
+          }
+        }
+      ],
+      "title": "DB Time Share By Endpoint",
+      "type": "table",
+      "description": "How much of each endpoint's total time is being spent in DB calls."
     },
     {
       "datasource": {
@@ -1062,31 +1305,46 @@
         "x": 12,
         "y": 35
       },
-      "id": 22,
+      "id": 25,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "textMode": "value"
+        "showHeader": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(db_sql_connection_wait_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
-          "range": true,
+          "expr": "topk(10, 1000 * sum by (http_route) (increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])))",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "DB Wait Events",
-      "type": "stat",
-      "description": "Connection-pool waits. If this climbs during latency or 5xx spikes, DB saturation is a likely part of the story."
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "http_route": "Route",
+              "Value": "DB Total ms",
+              "Value #A": "DB Total ms"
+            }
+          }
+        }
+      ],
+      "title": "DB Total Time By Endpoint",
+      "type": "table",
+      "description": "Endpoints spending the most total time in DB calls."
     },
     {
       "datasource": {
@@ -1096,25 +1354,9 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "background"
+            "mode": "palette-classic"
           },
-          "unit": "ms",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "value": 50,
-                "color": "yellow"
-              },
-              {
-                "value": 200,
-                "color": "red"
-              }
-            ]
-          }
+          "unit": "ms"
         },
         "overrides": []
       },
@@ -1124,31 +1366,46 @@
         "x": 18,
         "y": 35
       },
-      "id": 23,
+      "id": 26,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "textMode": "value"
+        "showHeader": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(db_sql_connection_wait_duration_milliseconds_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
-          "range": true,
+          "expr": "topk(10, 1000 * (sum by (http_route) (increase(db_query_duration_seconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])) / clamp_min(sum by (http_route) (increase(db_query_duration_seconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_route!=\"\"}[$__range])), 1)))",
+          "instant": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "DB Wait Time",
-      "type": "stat",
-      "description": "Total time spent waiting for DB connections in the selected window."
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "http_route": "Route",
+              "Value": "DB Avg ms",
+              "Value #A": "DB Avg ms"
+            }
+          }
+        }
+      ],
+      "title": "DB Avg Query Time By Endpoint",
+      "type": "table",
+      "description": "Endpoints with the highest average DB query latency."
     },
     {
       "collapsed": false,
@@ -1156,11 +1413,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 55
       },
       "id": 24,
       "panels": [],
-      "title": "API Logs",
+      "title": "Logs",
       "type": "row"
     },
     {
@@ -1172,7 +1429,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 41
+        "y": 56
       },
       "id": 18,
       "options": {
@@ -1187,6 +1444,10 @@
       },
       "targets": [
         {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "editorMode": "code",
           "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
           "queryType": "range",
@@ -1206,7 +1467,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 41
+        "y": 56
       },
       "id": 19,
       "options": {
@@ -1221,6 +1482,10 @@
       },
       "targets": [
         {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "editorMode": "code",
           "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
           "queryType": "range",

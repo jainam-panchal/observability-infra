@@ -53,6 +53,128 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "id": 22,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, round(sum by (job_name) (max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range]))))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "job_name": "Job Name",
+              "Value": "DB Queries",
+              "Value #A": "DB Queries"
+            }
+          }
+        }
+      ],
+      "title": "DB-Heavy Jobs",
+      "type": "table",
+      "description": "Jobs generating the most DB query-like operations."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "id": 23,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "topk(15, (sum by (job_name) (max_over_time(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])) / clamp_min(sum by (job_name) (max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name!=\"\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])), 1)))",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true
+            },
+            "renameByName": {
+              "job_name": "Job Name",
+              "Value": "DB Avg ms",
+              "Value #A": "DB Avg ms"
+            }
+          }
+        }
+      ],
+      "title": "Slow DB Jobs",
+      "type": "table",
+      "description": "Jobs whose DB query-like work is slowest."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "background"
           },
           "unit": "short"
@@ -82,7 +204,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "expr": "round(sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -128,7 +250,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range])) or vector(0)",
+          "expr": "round(sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"success|ok|completed\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -190,7 +312,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range])) or vector(0)",
+          "expr": "round(sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=~\"error|failed\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -539,7 +661,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job_name, job_status) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
+          "expr": "round(sum by (job_name, job_status) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -640,7 +762,7 @@
       },
       "id": 13,
       "panels": [],
-      "title": "DB Clues",
+      "title": "DB Signals",
       "type": "row"
     },
     {
@@ -696,14 +818,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "expr": "round(sum(max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "DB Queries",
+      "title": "DB Queries In Range",
       "type": "stat",
-      "description": "DB operations observed while the worker ran."
+      "description": "Observed DB query-like operations for the selected worker service."
     },
     {
       "datasource": {
@@ -758,14 +880,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "((sum(increase(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) / clamp_min(sum(increase(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])), 1))) or vector(0)",
+          "expr": "((sum(max_over_time(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])) / clamp_min(sum(max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])), 1))) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "DB Avg Query Time",
       "type": "stat",
-      "description": "Average DB query time for the selected worker service."
+      "description": "Average latency of worker DB query-like operations."
     },
     {
       "datasource": {
@@ -820,14 +942,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(db_sql_connection_wait_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "expr": "round((sum(max_over_time(db_sql_latency_milliseconds_count{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range])) / clamp_min(sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])), 1)), 0.01) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "DB Wait Events",
+      "title": "DB Queries / Run",
       "type": "stat",
-      "description": "Connection waits during worker execution."
+      "description": "Average DB query-like operations executed per worker run."
     },
     {
       "datasource": {
@@ -882,14 +1004,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(db_sql_connection_wait_duration_milliseconds_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])) or vector(0)",
+          "expr": "(sum(max_over_time(db_sql_latency_milliseconds_sum{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",db_operation=~\"sql.conn.exec|sql.conn.query|sql.stmt.exec|sql.stmt.query\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "DB Wait Time",
+      "title": "Total DB Time",
       "type": "stat",
-      "description": "Total time workers spent waiting on DB connections."
+      "description": "Total time spent inside DB query-like operations for the selected worker service."
     },
     {
       "collapsed": false,
@@ -897,9 +1019,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 39
       },
-      "id": 13,
+      "id": 21,
       "panels": [],
       "title": "Worker Logs",
       "type": "row"
@@ -913,7 +1035,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 30
+        "y": 40
       },
       "id": 14,
       "options": {
@@ -928,6 +1050,10 @@
       },
       "targets": [
         {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "editorMode": "code",
           "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
           "queryType": "range",
@@ -947,7 +1073,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 30
+        "y": 40
       },
       "id": 15,
       "options": {
@@ -962,6 +1088,10 @@
       },
       "targets": [
         {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "editorMode": "code",
           "expr": "{deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\"} | line_format \"[env={{ .deployment_environment }} service={{ .service_name }} level={{ .level }}] {{ __line__ }}\"",
           "queryType": "range",
