@@ -29,26 +29,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 10
-              }
-            ]
+            "mode": "background"
           },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 6,
         "x": 0,
         "y": 0
@@ -56,7 +44,7 @@
       "id": 1,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -65,17 +53,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[$__range]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log Lines Last 15m",
+      "title": "Log Lines In Range",
       "type": "stat"
     },
     {
@@ -86,7 +74,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "background"
           },
           "thresholds": {
             "mode": "absolute",
@@ -95,7 +83,7 @@
                 "color": "green"
               },
               {
-                "color": "red",
+                "color": "orange",
                 "value": 1
               }
             ]
@@ -105,7 +93,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 6,
         "x": 6,
         "y": 0
@@ -113,7 +101,7 @@
       "id": 2,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -122,17 +110,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"}[15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"ERROR|FATAL|PANIC\"}[$__range]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Error Logs Last 15m",
+      "title": "Error Logs In Range",
       "type": "stat"
     },
     {
@@ -143,26 +131,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              }
-            ]
+            "mode": "background"
           },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 6,
         "x": 12,
         "y": 0
@@ -170,7 +146,7 @@
       "id": 3,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -179,17 +155,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\"} |= \"trace_id\" [15m]))",
+          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"} |~ \"trace_id\" [$__range]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs With Trace IDs Last 15m",
+      "title": "Logs With Trace IDs",
       "type": "stat"
     },
     {
@@ -200,26 +176,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              }
-            ]
+            "mode": "background"
           },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 6,
         "x": 18,
         "y": 0
@@ -227,7 +191,7 @@
       "id": 4,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -236,17 +200,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"} |= \"trace_id\" [15m]))",
+          "expr": "count(sum by (service_name, level) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[$__range])))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Error Logs With Trace IDs Last 15m",
+      "title": "Active Log Streams",
       "type": "stat"
     },
     {
@@ -258,24 +222,30 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          }
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
-        "y": 5
+        "y": 4
       },
       "id": 5,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
           "displayMode": "table",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
@@ -285,12 +255,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (service_name) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[5m]))",
+          "expr": "sum by (level) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[$__interval]))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log Volume By Service",
+      "title": "Log Volume Over Time By Level",
       "type": "timeseries"
     },
     {
@@ -302,103 +272,60 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          }
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 5
+        "w": 12,
+        "x": 12,
+        "y": 4
       },
       "id": 6,
       "options": {
-        "legend": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "reduceOptions": {
           "calcs": [
             "lastNotNull"
           ],
-          "displayMode": "table",
-          "placement": "bottom"
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "showUnfilled": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[5m]))",
+          "expr": "topk(10, sum by (service_name) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[$__range])))",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log Volume By Level",
-      "type": "timeseries"
+      "title": "Services By Log Volume",
+      "type": "bargauge"
     },
     {
       "datasource": {
         "type": "loki",
         "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 5
-      },
-      "id": 7,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (deployment_environment) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$level\"}[5m]))",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Log Volume By Environment",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "gridPos": {
-        "h": 10,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 12
       },
-      "id": 8,
+      "id": 7,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": true,
         "showCommonLabels": false,
-        "showLabels": true,
+        "showLabels": false,
+        "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
@@ -419,25 +346,26 @@
         "uid": "loki"
       },
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 12
       },
-      "id": 9,
+      "id": 8,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": true,
         "showCommonLabels": false,
-        "showLabels": true,
+        "showLabels": false,
+        "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"}",
+          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"ERROR|FATAL|PANIC\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -452,22 +380,22 @@
   "tags": [
     "observability",
     "logs",
-    "backend"
+    "investigation"
   ],
   "templating": {
     "list": [
       {
-        "allValue": ".*",
+        "allValue": ".+",
         "current": {
           "selected": true,
           "text": "All",
-          "value": ".*"
+          "value": ".+"
         },
         "datasource": {
-          "type": "loki",
-          "uid": "loki"
+          "type": "prometheus",
+          "uid": "prometheus"
         },
-        "definition": "label_values({service_name=~\".+\"}, deployment_environment)",
+        "definition": "label_values(http_server_request_count_total, deployment_environment_name)",
         "hide": 0,
         "includeAll": true,
         "label": "Environment",
@@ -475,8 +403,9 @@
         "name": "environment",
         "options": [],
         "query": {
-          "query": "label_values({service_name=~\".+\"}, deployment_environment)",
-          "refId": "LokiVariableQueryEditor-VariableQuery"
+          "qryType": 1,
+          "query": "label_values(http_server_request_count_total, deployment_environment_name)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -484,17 +413,17 @@
         "type": "query"
       },
       {
-        "allValue": ".*",
+        "allValue": ".+",
         "current": {
           "selected": true,
           "text": "All",
-          "value": ".*"
+          "value": ".+"
         },
         "datasource": {
-          "type": "loki",
-          "uid": "loki"
+          "type": "prometheus",
+          "uid": "prometheus"
         },
-        "definition": "label_values({deployment_environment=~\"$environment\"}, service_name)",
+        "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
         "hide": 0,
         "includeAll": true,
         "label": "Service",
@@ -502,8 +431,9 @@
         "name": "service",
         "options": [],
         "query": {
-          "query": "label_values({deployment_environment=~\"$environment\"}, service_name)",
-          "refId": "LokiVariableQueryEditor-VariableQuery"
+          "qryType": 1,
+          "query": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "skipUrlSync": false,
@@ -511,20 +441,20 @@
         "type": "query"
       },
       {
-        "allValue": ".*",
+        "allValue": ".+",
         "current": {
           "selected": true,
           "text": "All",
-          "value": ".*"
+          "value": ".+"
         },
-        "definition": ".*,INFO,ERROR",
+        "definition": ".+,INFO,WARN,ERROR,DEBUG",
         "hide": 0,
         "includeAll": true,
         "label": "Level",
         "multi": false,
         "name": "level",
         "options": [],
-        "query": ".*,INFO,ERROR",
+        "query": ".+,INFO,WARN,ERROR,DEBUG",
         "refresh": 1,
         "skipUrlSync": false,
         "sort": 0,
@@ -538,8 +468,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Logs And Traces Drilldown",
+  "title": "Logs Investigation",
   "uid": "logs-and-traces-drilldown",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

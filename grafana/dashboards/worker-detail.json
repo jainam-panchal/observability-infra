@@ -29,34 +29,22 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              }
-            ]
+            "mode": "background"
           },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 6,
+        "h": 4,
+        "w": 4,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -65,17 +53,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"})",
+          "expr": "sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"}[$__range])) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Jobs Started Total",
+      "title": "Jobs Started In Range",
       "type": "stat"
     },
     {
@@ -86,34 +74,22 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              }
-            ]
+            "mode": "background"
           },
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 6,
+        "h": 4,
+        "w": 4,
+        "x": 4,
         "y": 0
       },
       "id": 2,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -122,17 +98,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"success\"})",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"success\"}[$__range])) or vector(0)",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Jobs Completed Total",
+      "title": "Jobs Completed In Range",
       "type": "stat"
     },
     {
@@ -143,66 +119,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "background"
           },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 12,
-        "y": 0
-      },
-      "id": 3,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value_and_name"
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"error\"})",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Jobs Failed Total",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 3,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -212,23 +130,27 @@
               {
                 "color": "orange",
                 "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
               }
             ]
           },
-          "unit": "s"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 18,
+        "h": 4,
+        "w": 4,
+        "x": 8,
         "y": 0
       },
-      "id": 4,
+      "id": 3,
       "options": {
         "colorMode": "background",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": [
@@ -237,12 +159,104 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"}[15m])))",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"error\"}[$__range])) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Jobs Failed In Range",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "decimals": 2,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100 * ((sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"error\"}[$__range])) or vector(0)) / clamp_min((sum(max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"}[$__range])) or vector(0)), 1))",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Failure Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "decimals": 3,
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"}[$__range])))",
           "range": true,
           "refId": "A"
         }
@@ -258,50 +272,43 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "background"
           },
-          "unit": "ops"
+          "decimals": 3,
+          "unit": "s"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 5
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
       },
-      "id": 5,
+      "id": 6,
       "options": {
-        "legend": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
           "calcs": [
             "lastNotNull"
           ],
-          "displayMode": "table",
-          "placement": "bottom"
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "textMode": "value"
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job_name) (rate(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[5m]))",
-          "legendFormat": "{{job_name}} started",
+          "expr": "histogram_quantile(0.99, sum by (le) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"}[$__range])))",
           "range": true,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "sum by (job_name) (rate(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[5m]))",
-          "legendFormat": "{{job_name}} completed",
-          "range": true,
-          "refId": "B"
         }
       ],
-      "title": "Job Throughput By Job Name",
-      "type": "timeseries"
+      "title": "P99 Job Duration",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -313,24 +320,29 @@
           "color": {
             "mode": "palette-classic"
           },
-          "unit": "ops"
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 5
+        "x": 0,
+        "y": 4
       },
-      "id": 6,
+      "id": 7,
       "options": {
         "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
           "displayMode": "table",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
@@ -340,10 +352,17 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job_status) (rate(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\"}[5m]))",
-          "legendFormat": "{{job_status}}",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"success\"}[$__interval]))",
+          "legendFormat": "success",
           "range": true,
           "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"error\"}[$__interval]))",
+          "legendFormat": "error",
+          "range": true,
+          "refId": "B"
         }
       ],
       "title": "Completion By Status",
@@ -364,13 +383,75 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 13
+        "w": 6,
+        "x": 12,
+        "y": 4
       },
-      "id": 7,
+      "id": 8,
       "options": {
-        "displayMode": "gradient",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"success\"}[$__range])) or vector(0)",
+          "legendFormat": "success",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_name=~\"$job_name\",job_status=\"error\"}[$__range])) or vector(0)",
+          "legendFormat": "error",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Completion Mix",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
+      "id": 9,
+      "options": {
+        "displayMode": "basic",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -384,13 +465,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, sum by (job_name) (worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}))",
+          "expr": "topk(8, sum by (job_name) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
           "legendFormat": "{{job_name}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Top Job Types By Volume",
+      "title": "Job Names By Volume",
       "type": "bargauge"
     },
     {
@@ -409,13 +490,13 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 13
+        "w": 12,
+        "x": 0,
+        "y": 12
       },
-      "id": 8,
+      "id": 10,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "basic",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -429,13 +510,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, histogram_quantile(0.95, sum by (job_name, le) (rate(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[15m]))))",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
           "legendFormat": "{{job_name}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Slowest Job Types By P95",
+      "title": "Job Names By P95 Duration",
       "type": "bargauge"
     },
     {
@@ -447,19 +528,20 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          }
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 13
+        "w": 12,
+        "x": 12,
+        "y": 12
       },
-      "id": 9,
+      "id": 11,
       "options": {
-        "displayMode": "gradient",
+        "displayMode": "basic",
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
@@ -473,122 +555,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(10, sum by (job_name) (worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"error\"}))",
+          "expr": "topk(10, sum by (job_name) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"error\"}[$__range]))) or vector(0)",
           "legendFormat": "{{job_name}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Top Failed Job Types",
+      "title": "Failed Job Names",
       "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 21
-      },
-      "id": 10,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({deployment_environment=~\"$environment\",service_name=~\"$service\"} | json | job_name=~\"$job_name\" | level=~\"$log_level\" [5m]))",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Log Volume By Level",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 8,
-        "y": 21
-      },
-      "id": 11,
-      "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=\"ERROR\"} | json | job_name=~\"$job_name\"",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Recent Worker Error Logs",
-      "type": "logs"
-    },
-    {
-      "datasource": {
-        "type": "loki",
-        "uid": "loki"
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 31
-      },
-      "id": 12,
-      "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "{deployment_environment=~\"$environment\",service_name=~\"$service\",level=~\"$log_level\"} | json | job_name=~\"$job_name\"",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "Recent Worker Logs",
-      "type": "logs"
     }
   ],
   "refresh": "10s",
@@ -597,8 +571,7 @@
   "tags": [
     "observability",
     "worker",
-    "detail",
-    "backend"
+    "debug"
   ],
   "templating": {
     "list": [
@@ -685,46 +658,6 @@
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": ".*"
-        },
-        "definition": ".*,success,error",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Job Status",
-        "multi": false,
-        "name": "job_status",
-        "options": [],
-        "query": ".*,success,error",
-        "refresh": 1,
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "custom"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": ".*"
-        },
-        "definition": ".*,INFO,ERROR",
-        "hide": 0,
-        "includeAll": true,
-        "label": "Log Level",
-        "multi": false,
-        "name": "log_level",
-        "options": [],
-        "query": ".*,INFO,ERROR",
-        "refresh": 1,
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "custom"
       }
     ]
   },
@@ -734,8 +667,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Worker Detail",
+  "title": "Worker Debug",
   "uid": "worker-detail-v3",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }

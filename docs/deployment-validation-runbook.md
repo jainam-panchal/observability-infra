@@ -331,12 +331,14 @@ Pass criteria:
 
 ### 9.5 Dashboard Validation
 
-Open the four dashboards:
+Open the core dashboards:
 
-- Service Overview
-- Worker Overview
+- Service Fleet
+- Service Debug
+- Worker Fleet
+- Worker Debug
 - Observability Platform Health
-- Logs and Traces Drilldown
+- Logs Investigation
 
 Pass criteria:
 
@@ -358,7 +360,7 @@ Validate:
 - a request trace appears in Tempo
 - request logs appear in Loki
 - request metrics appear in Prometheus and Grafana
-- the Service Overview dashboard filters work for the service
+- the Service Fleet and Service Debug dashboards filter correctly for the service
 - if the API uses GORM, a DB child span appears in the trace
 
 Pass criteria:
@@ -378,7 +380,7 @@ Validate:
 - a worker root span appears in Tempo
 - worker logs appear in Loki
 - worker metrics appear in Prometheus and Grafana
-- the Worker Overview dashboard filters work for the service and job type
+- the Worker Fleet and Worker Debug dashboards filter correctly for the service and job type
 - if the worker touches the DB, a DB child span appears in the trace
 
 Pass criteria:

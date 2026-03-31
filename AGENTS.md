@@ -85,12 +85,14 @@ Checklist rule:
   - the central Prometheus exporter must keep `resource_to_telemetry_conversion.enabled: true` so application resource attributes such as `deployment.environment` become queryable metric labels; the current exported Prometheus label name is `deployment_environment_name`
   - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, and `http_server_active_requests`
   - `service-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
-  - `service-detail.json` is the backend debugging board and now uses `environment`, `service`, `route`, `method`, `status_family`, and `log_level`; it must stay focused on ingress HTTP behavior, route hotspots, outbound HTTP pressure, and logs
+  - `service-detail.json` is the backend debugging board and now uses `environment`, `service`, `route`, and `method`; it must stay focused on ingress HTTP behavior and route hotspots, and must not depend on logs or outbound metrics unless those signals are verified live
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
   - `worker-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
-  - `worker-detail.json` is the backend worker debugging board and now uses `environment`, `service`, `job_name`, `job_status`, and `log_level`; it must stay focused on job throughput, job failure shape, slow job types, and logs
+  - `worker-detail.json` is the backend worker debugging board and now uses `environment`, `service`, and `job_name`; it must stay focused on job throughput, job failure shape, and slow job types, and should prefer total-over-range semantics when worker telemetry is sparse
+  - sparse worker dashboards in this pilot must prefer `max_over_time(...)` over `increase(...)` for counters and histogram buckets because one-shot workers may only be scraped once; `increase(...)` collapses to `0` and histogram quantiles become `NaN`
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
-  - logs and traces drilldown dashboard uses `environment`, `service`, and `level` filters; those primary filters must persist through URL state and time-range changes
+  - `logs-and-traces-drilldown.json` is the dedicated logs investigation board and uses `environment`, `service`, and `level`; keep logs out of service and worker dashboards until live Loki ingestion is verified
+  - Grafana logs dashboards that use Loki metric queries must use non-empty `All` regex values such as `.+`; Loki rejects empty-compatible matchers like `=~".*"` in metric-style queries
   - do not use `skipUrlSync: true` on primary Grafana filters such as `environment`, `service`, `route`, and `job_name`; drilldown state must persist across reloads and time-range changes
   - do not ship custom Grafana variables with `includeAll: false` while `current` is set to `All`; either enable `All` explicitly or set a concrete default
   - the logs dashboard should stay centered on recent logs, error logs, and volume-by-dimension views; do not execute an empty `trace_id` textbox as a Loki filter

@@ -177,10 +177,12 @@ The implementation checklist lives at:
 
 The initial Grafana baseline should include:
 
-- Service Overview dashboard
-- Worker Overview dashboard
+- Service Fleet dashboard
+- Service Debug dashboard
+- Worker Fleet dashboard
+- Worker Debug dashboard
 - Observability Platform Health dashboard
-- Logs and Traces Drilldown dashboard
+- Logs Investigation dashboard
 
 The detailed dashboard specification should live in:
 
