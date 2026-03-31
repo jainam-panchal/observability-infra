@@ -65,7 +65,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value"
+        "textMode": "value_and_name"
       },
       "targets": [
         {
@@ -127,7 +127,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value"
+        "textMode": "value_and_name"
       },
       "targets": [
         {
@@ -189,7 +189,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value"
+        "textMode": "value_and_name"
       },
       "targets": [
         {
@@ -246,7 +246,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value"
+        "textMode": "value_and_name"
       },
       "targets": [
         {
@@ -701,8 +701,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "nonprod",
-          "value": "nonprod"
+          "text": "All",
+          "value": ".*"
         },
         "datasource": {
           "type": "prometheus",
@@ -710,7 +710,7 @@
         },
         "definition": "label_values(http_server_request_count_total, deployment_environment_name)",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Environment",
         "multi": false,
         "name": "environment",
@@ -729,8 +729,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "e2e-api",
-          "value": "e2e-api"
+          "text": "All",
+          "value": ".*"
         },
         "datasource": {
           "type": "prometheus",
@@ -738,7 +738,7 @@
         },
         "definition": "label_values(http_server_request_count_total{deployment_environment_name=~\"$environment\"}, exported_job)",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Service",
         "multi": false,
         "name": "service",
