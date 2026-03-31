@@ -85,10 +85,12 @@ Checklist rule:
   - the central Prometheus exporter must keep `resource_to_telemetry_conversion.enabled: true` so application resource attributes such as `deployment.environment` become queryable metric labels; the current exported Prometheus label name is `deployment_environment_name`
   - service dashboard uses Prometheus-translated metric names `http_server_request_count_total`, `http_server_request_duration_seconds_bucket`, and `http_server_active_requests`
   - `service-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
-  - `service-detail.json` is the backend debugging board and now uses `environment`, `service`, `route`, and `method`; it must stay focused on ingress HTTP behavior and route hotspots, and must not depend on logs or outbound metrics unless those signals are verified live
+  - aggregate service panels must surface both `deployment_environment_name` and `exported_job`; do not ship multi-service fleet views that collapse away environment/service attribution
+  - `service-detail.json` is the backend debugging board and must use only `environment` and `service` as top-level filters; route and method breakdown belongs inside panels and tables, not as primary dashboard selectors
   - worker dashboard uses `worker_job_started_total`, `worker_job_completed_total`, and `worker_job_duration_seconds_bucket`
   - `worker-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
-  - `worker-detail.json` is the backend worker debugging board and now uses `environment`, `service`, and `job_name`; it must stay focused on job throughput, job failure shape, and slow job types, and should prefer total-over-range semantics when worker telemetry is sparse
+  - aggregate worker panels must surface both `deployment_environment_name` and `exported_job`; do not ship multi-service worker views that hide which environment or service produced a series
+  - `worker-detail.json` is the backend worker debugging board and must use only `environment` and `service` as top-level filters; job-name breakdown belongs inside panels and tables, not as a primary dashboard selector
   - sparse worker dashboards in this pilot must prefer `max_over_time(...)` over `increase(...)` for counters and histogram buckets because one-shot workers may only be scraped once; `increase(...)` collapses to `0` and histogram quantiles become `NaN`
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
   - `logs-and-traces-drilldown.json` is the dedicated logs investigation board and uses `environment`, `service`, and `level`; keep logs out of service and worker dashboards until live Loki ingestion is verified
@@ -97,6 +99,7 @@ Checklist rule:
   - do not ship custom Grafana variables with `includeAll: false` while `current` is set to `All`; either enable `All` explicitly or set a concrete default
   - the logs dashboard should stay centered on recent logs, error logs, and volume-by-dimension views; do not execute an empty `trace_id` textbox as a Loki filter
   - current Prometheus label keys for application metrics are `deployment_environment_name`, `exported_job`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`; do not build service and worker dashboards around `service_name` unless the exporter contract changes
+  - for Prometheus-backed Grafana variables on service and worker dashboards, `All` must use a non-empty regex such as `.+` so unlabeled legacy series are excluded from multi-service aggregate views
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
 - current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented
 - current central runtime baseline: central compose now depends on repository-owned `loki/config.yaml` and `tempo/config.yaml`; if backend ports, mounted paths, or collector exporter targets change, update all three in the same change set

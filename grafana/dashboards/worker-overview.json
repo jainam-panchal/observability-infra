@@ -261,8 +261,8 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))",
-          "legendFormat": "{{exported_job}}",
+          "expr": "sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__interval]))",
+          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
         }
@@ -312,8 +312,8 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"error\"}[$__interval]))",
-          "legendFormat": "{{exported_job}}",
+          "expr": "sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"error\"}[$__interval]))",
+          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": true,
           "refId": "A"
         }
@@ -330,7 +330,8 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
-          }
+          },
+          "unit": "short"
         },
         "overrides": []
       },
@@ -342,45 +343,43 @@
       },
       "id": 7,
       "options": {
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom"
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showHeader": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"success\"}[$__range])) or vector(0)",
-          "legendFormat": "success",
-          "range": true,
+          "expr": "topk(20, sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
+          "range": false,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "sum(max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"error\"}[$__range])) or vector(0)",
-          "legendFormat": "error",
-          "range": true,
-          "refId": "B"
         }
       ],
-      "title": "Completion By Status",
-      "type": "piechart"
+      "title": "Started Jobs Snapshot",
+      "type": "table",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "deployment_environment_name": "Environment",
+              "exported_job": "Service",
+              "Value": "Started Jobs"
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -413,14 +412,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(8, sum by (job_name) (max_over_time(worker_job_started_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "expr": "topk(20, sum by (deployment_environment_name, exported_job) (max_over_time(worker_job_completed_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",job_status=\"error\"}[$__range])))",
           "instant": true,
-          "legendFormat": "{{job_name}}",
+          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Top Job Names By Volume",
+      "title": "Failed Jobs Snapshot",
       "transformations": [
         {
           "id": "labelsToFields",
@@ -433,8 +432,9 @@
               "Time": true
             },
             "renameByName": {
-              "job_name": "Job Name",
-              "Value": "Started Jobs"
+              "deployment_environment_name": "Environment",
+              "exported_job": "Service",
+              "Value": "Failed Jobs"
             }
           }
         }
@@ -472,14 +472,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(8, histogram_quantile(0.95, sum by (le, job_name) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
+          "expr": "topk(20, histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (max_over_time(worker_job_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
           "instant": true,
-          "legendFormat": "{{job_name}}",
+          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Slowest Job Names By P95",
+      "title": "Slow Services By P95",
       "transformations": [
         {
           "id": "labelsToFields",
@@ -492,7 +492,8 @@
               "Time": true
             },
             "renameByName": {
-              "job_name": "Job Name",
+              "deployment_environment_name": "Environment",
+              "exported_job": "Service",
               "Value": "P95 Duration"
             }
           }
@@ -512,11 +513,11 @@
   "templating": {
     "list": [
       {
-        "allValue": ".*",
+        "allValue": ".+",
         "current": {
           "selected": true,
           "text": "All",
-          "value": ".*"
+          "value": ".+"
         },
         "datasource": {
           "type": "prometheus",
@@ -540,11 +541,11 @@
         "type": "query"
       },
       {
-        "allValue": ".*",
+        "allValue": ".+",
         "current": {
           "selected": true,
           "text": "All",
-          "value": ".*"
+          "value": ".+"
         },
         "datasource": {
           "type": "prometheus",
@@ -577,6 +578,6 @@
   "timezone": "",
   "title": "Worker Fleet",
   "uid": "worker-overview",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }
