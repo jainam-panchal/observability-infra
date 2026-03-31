@@ -721,7 +721,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -749,7 +749,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -777,7 +777,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -790,14 +790,14 @@
         },
         "definition": ".*,GET,POST,PUT,PATCH,DELETE",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Method",
         "multi": false,
         "name": "method",
         "options": [],
         "query": ".*,GET,POST,PUT,PATCH,DELETE",
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 0,
         "type": "custom"
       },
@@ -810,14 +810,14 @@
         },
         "definition": ".*,2..,4..,5..",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Status Family",
         "multi": false,
         "name": "status_family",
         "options": [],
         "query": ".*,2..,4..,5..",
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 0,
         "type": "custom"
       },
@@ -830,14 +830,14 @@
         },
         "definition": ".*,INFO,ERROR",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Log Level",
         "multi": false,
         "name": "log_level",
         "options": [],
         "query": ".*,INFO,ERROR",
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 0,
         "type": "custom"
       }

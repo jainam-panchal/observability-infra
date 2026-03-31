@@ -460,7 +460,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -488,7 +488,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       }

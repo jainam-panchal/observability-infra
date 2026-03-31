@@ -90,8 +90,9 @@ Checklist rule:
   - `worker-overview.json` is the fleet operator dashboard and now uses `environment` then `service` as the only top-level filters
   - `worker-detail.json` is the backend worker debugging board and now uses `environment`, `service`, `job_name`, `job_status`, and `log_level`; it must stay focused on job throughput, job failure shape, slow job types, and logs
   - platform dashboard uses `up`, `otelcol_exporter_sent_*`, `otelcol_exporter_send_failed_*`, `otelcol_exporter_queue_size`, `otelcol_processor_dropped_*`, `process_resident_memory_bytes`, and `process_cpu_time_seconds_total`
-  - logs and traces drilldown dashboard is now a no-selector operational log board; service, environment, and level dimensions must be visible directly in panels instead of relying on template-variable state
-  - do not reintroduce fragile dashboard-variable flows for service/environment unless there is a strong proven operator benefit and a live validation path
+  - logs and traces drilldown dashboard uses `environment`, `service`, and `level` filters; those primary filters must persist through URL state and time-range changes
+  - do not use `skipUrlSync: true` on primary Grafana filters such as `environment`, `service`, `route`, and `job_name`; drilldown state must persist across reloads and time-range changes
+  - do not ship custom Grafana variables with `includeAll: false` while `current` is set to `All`; either enable `All` explicitly or set a concrete default
   - the logs dashboard should stay centered on recent logs, error logs, and volume-by-dimension views; do not execute an empty `trace_id` textbox as a Loki filter
   - current Prometheus label keys for application metrics are `deployment_environment_name`, `exported_job`, `instance`, `http_route`, `http_response_status_code`, `job_name`, and `job_status`; do not build service and worker dashboards around `service_name` unless the exporter contract changes
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set

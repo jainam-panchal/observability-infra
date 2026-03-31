@@ -626,7 +626,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -654,7 +654,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -682,7 +682,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -695,14 +695,14 @@
         },
         "definition": ".*,success,error",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Job Status",
         "multi": false,
         "name": "job_status",
         "options": [],
         "query": ".*,success,error",
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 0,
         "type": "custom"
       },
@@ -715,14 +715,14 @@
         },
         "definition": ".*,INFO,ERROR",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Log Level",
         "multi": false,
         "name": "log_level",
         "options": [],
         "query": ".*,INFO,ERROR",
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 0,
         "type": "custom"
       }

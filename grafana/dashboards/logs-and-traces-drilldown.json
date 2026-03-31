@@ -479,7 +479,7 @@
           "refId": "LokiVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -506,7 +506,7 @@
           "refId": "LokiVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
@@ -519,14 +519,14 @@
         },
         "definition": ".*,INFO,ERROR",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Level",
         "multi": false,
         "name": "level",
         "options": [],
         "query": ".*,INFO,ERROR",
         "refresh": 1,
-        "skipUrlSync": true,
+        "skipUrlSync": false,
         "sort": 0,
         "type": "custom"
       }
