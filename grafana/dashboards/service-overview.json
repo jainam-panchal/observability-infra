@@ -29,235 +29,92 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "background"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          },
-          "unit": "short"
+            "mode": "palette-classic"
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 6,
+        "h": 10,
+        "w": 24,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
         },
-        "textMode": "value"
+        "showHeader": true
       },
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
-          "range": true,
+          "expr": "sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))",
+          "instant": true,
+          "range": false,
           "refId": "A"
-        }
-      ],
-      "title": "Requests In Range",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "background"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 5
-              }
-            ]
-          },
-          "unit": "short"
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value"
-      },
-      "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])) or vector(0)",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "5xx In Range",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "background"
-          },
-          "decimals": 2,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 5
-              }
-            ]
-          },
-          "unit": "percent"
+          "expr": "sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__range])) or vector(0)",
+          "instant": true,
+          "range": false,
+          "refId": "B"
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 0
-      },
-      "id": 3,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value"
-      },
-      "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * ((sum(rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval])) or vector(0)) / clamp_min((sum(rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])) or vector(0)), 1))",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "5xx Rate",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "background"
-          },
-          "decimals": 3,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "orange",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 3
-              }
-            ]
-          },
-          "unit": "s"
+          "expr": "100 * ((sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\",http_response_status_code=~\"5..\"}[$__rate_interval])) or on() vector(0)) / clamp_min(sum by (deployment_environment_name, exported_job) (rate(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])), 1))",
+          "instant": true,
+          "range": false,
+          "refId": "C"
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "value"
-      },
-      "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "range": true,
-          "refId": "A"
+          "expr": "histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
+          "instant": true,
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum by (deployment_environment_name, exported_job) (http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
+          "instant": true,
+          "range": false,
+          "refId": "E"
         }
       ],
-      "title": "P95 Latency",
-      "type": "stat"
+      "title": "Service Summary",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {}
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "deployment_environment_name": "Environment",
+              "exported_job": "Service",
+              "Value": "Requests",
+              "Value #A": "Requests",
+              "Value #B": "5xx",
+              "Value #C": "Error %",
+              "Value #D": "P95",
+              "Value #E": "Active"
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
@@ -274,7 +131,6 @@
             "fillOpacity": 10,
             "lineInterpolation": "linear",
             "lineWidth": 2,
-            "pointSize": 2,
             "showPoints": "never"
           },
           "unit": "reqps"
@@ -285,9 +141,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 10
       },
-      "id": 5,
+      "id": 2,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -326,7 +182,6 @@
             "fillOpacity": 10,
             "lineInterpolation": "linear",
             "lineWidth": 2,
-            "pointSize": 2,
             "showPoints": "never"
           },
           "unit": "s"
@@ -337,9 +192,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 4
+        "y": 10
       },
-      "id": 6,
+      "id": 3,
       "options": {
         "legend": {
           "displayMode": "table",
@@ -362,189 +217,6 @@
       ],
       "title": "P95 Latency By Service",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 12
-      },
-      "id": 7,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(20, sum by (deployment_environment_name, exported_job) (http_server_active_requests{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}))",
-          "instant": true,
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "Active Requests By Service",
-      "type": "table",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "deployment_environment_name": "Environment",
-              "exported_job": "Service",
-              "Value": "Active Requests",
-              "Value #A": "Active Requests"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 12
-      },
-      "id": 8,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(20, sum by (deployment_environment_name, exported_job) (increase(http_server_request_count_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range])))",
-          "instant": true,
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "Requests By Service",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "deployment_environment_name": "Environment",
-              "exported_job": "Service",
-              "Value": "Requests",
-              "Value #A": "Requests"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 12
-      },
-      "id": 9,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "show": false
-        },
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "topk(20, histogram_quantile(0.95, sum by (le, deployment_environment_name, exported_job) (increase(http_server_request_duration_seconds_bucket{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__range]))))",
-          "instant": true,
-          "legendFormat": "{{deployment_environment_name}} / {{exported_job}}",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "Slow Services By P95",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {}
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true
-            },
-            "renameByName": {
-              "deployment_environment_name": "Environment",
-              "exported_job": "Service",
-              "Value": "P95 Latency",
-              "Value #A": "P95 Latency"
-            }
-          }
-        }
-      ],
-      "type": "table"
     }
   ],
   "refresh": "10s",
@@ -623,6 +295,6 @@
   "timezone": "",
   "title": "Service Fleet",
   "uid": "service-overview",
-  "version": 4,
+  "version": 5,
   "weekStart": ""
 }
