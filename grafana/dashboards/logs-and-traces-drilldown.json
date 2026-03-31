@@ -296,7 +296,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(20, sum by (scope) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"} | label_format scope=\"{{.deployment_environment}} / {{.service_name}}\" [$__range])))",
+          "expr": "topk(20, sum by (deployment_environment, service_name) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__range])))",
           "instant": true,
           "queryType": "instant",
           "refId": "A"
@@ -312,20 +312,20 @@
           "options": {
             "excludeByName": {
               "Time": true,
-              "deployment_environment": true,
-              "service_name": true
+              "__name__": true
             },
             "renameByName": {
+              "deployment_environment": "Environment",
+              "service_name": "Service",
               "Value": "Log Lines",
-              "Value #A": "Log Lines",
-              "scope": "Target"
+              "Value #A": "Log Lines"
             }
           }
         }
       ],
       "title": "Services By Log Volume",
       "type": "table",
-      "description": "Log volume by env/service combined into a single target column."
+      "description": "Which services are producing the most logs in the selected scope."
     },
     {
       "datasource": {
@@ -357,7 +357,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "topk(15, sum by (service_name, msg) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"} | json | __error__=\"\" [$__range])))",
+          "expr": "topk(15, sum by (service_name) (count_over_time({deployment_environment=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"ERROR|FATAL|PANIC\"}[$__range])))",
           "instant": true,
           "queryType": "instant",
           "refId": "A"
@@ -372,20 +372,20 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "__name__": true
             },
             "renameByName": {
               "service_name": "Service",
-              "msg": "Error Pattern",
-              "Value": "Count",
-              "Value #A": "Count"
+              "Value": "Errors",
+              "Value #A": "Errors"
             }
           }
         }
       ],
-      "title": "Structured Error Groups",
+      "title": "Errors By Service",
       "type": "table",
-      "description": "Fast grouping of repeated structured errors."
+      "description": "Which services are currently producing error logs."
     },
     {
       "collapsed": false,
@@ -430,9 +430,9 @@
           "refId": "A"
         }
       ],
-      "title": "Live Error Stream",
+      "title": "Recent Error Logs",
       "type": "logs",
-      "description": "Live incident stream for responders."
+      "description": "Latest application errors across the selected scope."
     },
     {
       "datasource": {
