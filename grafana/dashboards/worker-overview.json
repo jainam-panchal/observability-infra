@@ -65,7 +65,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -122,7 +122,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -180,7 +180,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -237,7 +237,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -440,8 +440,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "All",
-          "value": ".*"
+          "text": "nonprod",
+          "value": "nonprod"
         },
         "datasource": {
           "type": "prometheus",
@@ -449,7 +449,7 @@
         },
         "definition": "label_values(worker_job_started_total, deployment_environment_name)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Environment",
         "multi": false,
         "name": "environment",
@@ -468,8 +468,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "All",
-          "value": ".*"
+          "text": "e2e-worker",
+          "value": "e2e-worker"
         },
         "datasource": {
           "type": "prometheus",
@@ -477,7 +477,7 @@
         },
         "definition": "label_values(worker_job_started_total{deployment_environment_name=~\"$environment\"}, exported_job)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Worker Service",
         "multi": false,
         "name": "service",

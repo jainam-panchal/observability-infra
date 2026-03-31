@@ -65,7 +65,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -122,7 +122,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -179,7 +179,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -236,7 +236,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name"
+        "textMode": "value"
       },
       "targets": [
         {
@@ -460,8 +460,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "All",
-          "value": ".*"
+          "text": "nonprod",
+          "value": "nonprod"
         },
         "datasource": {
           "type": "loki",
@@ -469,7 +469,7 @@
         },
         "definition": "label_values({service_name=~\".+\"}, deployment_environment)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Environment",
         "multi": false,
         "name": "environment",
@@ -487,8 +487,8 @@
         "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "All",
-          "value": ".*"
+          "text": "e2e-api",
+          "value": "e2e-api"
         },
         "datasource": {
           "type": "loki",
@@ -496,7 +496,7 @@
         },
         "definition": "label_values({deployment_environment=~\"$environment\"}, service_name)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "Service",
         "multi": false,
         "name": "service",
