@@ -39,6 +39,15 @@ The central stack environment must also provide:
 - `LOKI_PUSH_ENDPOINT`
 - `TEMPO_OTLP_ENDPOINT`
 - `TEMPO_OTLP_INSECURE`
+- `CENTRAL_DEFAULT_BATCH_TIMEOUT`
+- `CENTRAL_LOG_BATCH_TIMEOUT`
+
+Recommended low-latency log settings:
+
+- `CENTRAL_DEFAULT_BATCH_TIMEOUT=5s`
+- `CENTRAL_LOG_BATCH_TIMEOUT=250ms`
+
+This keeps logs moving to Loki quickly without forcing the same flush cadence for traces and metrics.
 
 ## Exposed Ports
 

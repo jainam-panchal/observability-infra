@@ -98,3 +98,4 @@ Checklist rule:
 - if exported metric names or label keys change in `go-observability`, update this file and the affected dashboard JSON definitions in the same change set
 - current local deployment standard: use `deploy/local/docker-compose.yml` with the canonical `collector/local/config.yaml`, host Docker log mounts, and host-published OTLP ports unless an explicit host-network requirement is documented
 - current central runtime baseline: central compose now depends on repository-owned `loki/config.yaml` and `tempo/config.yaml`; if backend ports, mounted paths, or collector exporter targets change, update all three in the same change set
+- log delivery latency is controlled separately from metrics and traces: local collector must keep `LOCAL_LOG_POLL_INTERVAL`, `LOCAL_LOG_BATCH_TIMEOUT`, and `LOCAL_DEFAULT_BATCH_TIMEOUT` configurable, and central collector must keep `CENTRAL_LOG_BATCH_TIMEOUT` separate from the default batch timeout

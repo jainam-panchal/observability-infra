@@ -28,9 +28,13 @@ processors:
         key: loki.resource.labels
         value: service.name,deployment.environment
 
-  batch:
+  batch/default:
     send_batch_size: 2048
-    timeout: 5s
+    timeout: ${env:CENTRAL_DEFAULT_BATCH_TIMEOUT}
+
+  batch/logs:
+    send_batch_size: 128
+    timeout: ${env:CENTRAL_LOG_BATCH_TIMEOUT}
 
 exporters:
   prometheus:
@@ -61,7 +65,7 @@ service:
         - otlp
       processors:
         - memory_limiter
-        - batch
+        - batch/default
       exporters:
         - otlp/tempo
 
@@ -70,7 +74,7 @@ service:
         - otlp
       processors:
         - memory_limiter
-        - batch
+        - batch/default
       exporters:
         - prometheus
 
@@ -81,6 +85,6 @@ service:
         - memory_limiter
         - attributes/loki
         - resource/loki
-        - batch
+        - batch/logs
       exporters:
         - loki

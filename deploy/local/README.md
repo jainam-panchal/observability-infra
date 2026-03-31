@@ -42,6 +42,17 @@ Set:
 - `DEPLOYMENT_ENVIRONMENT`
 - `HOST_NAME`
 - `HOST_ID`
+- `LOCAL_DEFAULT_BATCH_TIMEOUT`
+- `LOCAL_LOG_BATCH_TIMEOUT`
+- `LOCAL_LOG_POLL_INTERVAL`
+
+Recommended low-latency log settings:
+
+- `LOCAL_DEFAULT_BATCH_TIMEOUT=5s`
+- `LOCAL_LOG_BATCH_TIMEOUT=250ms`
+- `LOCAL_LOG_POLL_INTERVAL=200ms`
+
+Use a lower `LOCAL_LOG_BATCH_TIMEOUT` only for logs. Keep traces and metrics on the default batch timeout unless you have a specific low-latency requirement for them too.
 
 ## Validate Before Startup
 
