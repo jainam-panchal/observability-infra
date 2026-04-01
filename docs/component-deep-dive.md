@@ -16,11 +16,11 @@ This document is organized by component, not by signal.
 
 Config:
 
-- [collector/local/config.yaml](/home/jainam/repository/observability-infra/collector/local/config.yaml)
+- [collector/local/config.yaml](../collector/local/config.yaml)
 
 Deployment:
 
-- [deploy/local/docker-compose.yml](/home/jainam/repository/observability-infra/deploy/local/docker-compose.yml)
+- [deploy/local/docker-compose.yml](../deploy/local/docker-compose.yml)
 
 ### What it does
 
@@ -80,11 +80,11 @@ That is intentional:
 
 Config:
 
-- [collector/central/config.yaml](/home/jainam/repository/observability-infra/collector/central/config.yaml)
+- [collector/central/config.yaml](../collector/central/config.yaml)
 
 Deployment:
 
-- [deploy/central/docker-compose.yml](/home/jainam/repository/observability-infra/deploy/central/docker-compose.yml)
+- [deploy/central/docker-compose.yml](../deploy/central/docker-compose.yml)
 
 ### What it does
 
@@ -129,8 +129,8 @@ Without this step, log search in Grafana would be much weaker.
 
 Config:
 
-- [prometheus/prometheus.yml](/home/jainam/repository/observability-infra/prometheus/prometheus.yml)
-- [prometheus/alert-rules.yml](/home/jainam/repository/observability-infra/prometheus/alert-rules.yml)
+- [prometheus/prometheus.yml](../prometheus/prometheus.yml)
+- [prometheus/alert-rules.yml](../prometheus/alert-rules.yml)
 
 ### What it scrapes
 
@@ -161,7 +161,7 @@ This is the correct early-stage approach because alerting should start narrow an
 
 Config:
 
-- [loki/config.yaml](/home/jainam/repository/observability-infra/loki/config.yaml)
+- [loki/config.yaml](../loki/config.yaml)
 
 ### Storage model
 
@@ -185,7 +185,7 @@ That aligns well with JSON logs and Grafana exploration workflows.
 
 Config:
 
-- [tempo/config.yaml](/home/jainam/repository/observability-infra/tempo/config.yaml)
+- [tempo/config.yaml](../tempo/config.yaml)
 
 ### Storage model
 
@@ -217,13 +217,13 @@ That matters because:
 
 Provisioning:
 
-- [grafana/provisioning/datasources/datasources.yml](/home/jainam/repository/observability-infra/grafana/provisioning/datasources/datasources.yml)
+- [grafana/provisioning/datasources/datasources.yml](../grafana/provisioning/datasources/datasources.yml)
 
 Dashboards:
 
-- [grafana/dashboards/service-overview.json](/home/jainam/repository/observability-infra/grafana/dashboards/service-overview.json)
-- [grafana/dashboards/worker-overview.json](/home/jainam/repository/observability-infra/grafana/dashboards/worker-overview.json)
-- [grafana/dashboards/logs-and-traces-drilldown.json](/home/jainam/repository/observability-infra/grafana/dashboards/logs-and-traces-drilldown.json)
+- [grafana/dashboards/service-overview.json](../grafana/dashboards/service-overview.json)
+- [grafana/dashboards/worker-overview.json](../grafana/dashboards/worker-overview.json)
+- [grafana/dashboards/logs-and-traces-drilldown.json](../grafana/dashboards/logs-and-traces-drilldown.json)
 
 ### Data source model
 
@@ -261,8 +261,8 @@ That gives Grafana a structured pivot from logs back into Tempo.
 
 There are two compose entry points:
 
-- [deploy/central/docker-compose.yml](/home/jainam/repository/observability-infra/deploy/central/docker-compose.yml)
-- [deploy/local/docker-compose.yml](/home/jainam/repository/observability-infra/deploy/local/docker-compose.yml)
+- [deploy/central/docker-compose.yml](../deploy/central/docker-compose.yml)
+- [deploy/local/docker-compose.yml](../deploy/local/docker-compose.yml)
 
 ### Why deployment wrappers are separate from collector configs
 
@@ -333,4 +333,3 @@ Likely causes:
 - not enough recent indexed traces for autocomplete
 
 That is why the repository sets `timeRangeForTags: 86400`.
-

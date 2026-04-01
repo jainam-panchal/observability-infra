@@ -16,8 +16,8 @@ It is meant to answer:
 
 This is the architecture-level guide. For file-by-file detail, use:
 
-- [component-deep-dive.md](/home/jainam/repository/observability-infra/docs/component-deep-dive.md)
-- [repository-structure-guide.md](/home/jainam/repository/observability-infra/docs/repository-structure-guide.md)
+- [component-deep-dive.md](component-deep-dive.md)
+- [repository-structure-guide.md](repository-structure-guide.md)
 
 ## System In One Sentence
 
@@ -445,7 +445,6 @@ This stack is intentionally practical, not maximal.
 
 ## What To Read Next
 
-- [component-deep-dive.md](/home/jainam/repository/observability-infra/docs/component-deep-dive.md)
-- [repository-structure-guide.md](/home/jainam/repository/observability-infra/docs/repository-structure-guide.md)
-- [deployment-validation-runbook.md](/home/jainam/repository/observability-infra/docs/deployment-validation-runbook.md)
-
+- [component-deep-dive.md](component-deep-dive.md)
+- [repository-structure-guide.md](repository-structure-guide.md)
+- [deployment-validation-runbook.md](deployment-validation-runbook.md)

@@ -222,7 +222,7 @@ and verify whether Grafana provisioning or data source assumptions also need to 
 Use this order when learning the system:
 
 1. `README.md`
-2. [system-guidebook.md](/home/jainam/repository/observability-infra/docs/system-guidebook.md)
+2. [system-guidebook.md](system-guidebook.md)
 3. `deploy/central/docker-compose.yml`
 4. `deploy/local/docker-compose.yml`
 5. `collector/local/config.yaml`
@@ -238,4 +238,3 @@ That order matches the architectural layering:
 - routing path
 - storage path
 - operator UX
-

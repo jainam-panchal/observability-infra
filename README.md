@@ -117,7 +117,7 @@ Why it exists:
 
 Start with:
 
-- [docs/README.md](/home/jainam/repository/observability-infra/docs/README.md)
+- [docs/README.md](docs/README.md)
 
 That guidebook explains:
 
