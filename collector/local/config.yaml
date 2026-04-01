@@ -55,6 +55,11 @@ receivers:
         from: attributes.deployment_environment_name
         to: resource["deployment.environment.name"]
         if: attributes.deployment_environment_name != nil
+      - id: app-service-role-resource
+        type: move
+        from: attributes.service_role
+        to: resource["service.role"]
+        if: attributes.service_role != nil
 
   filelog/app:
     include:
@@ -82,6 +87,11 @@ receivers:
         from: attributes.deployment_environment_name
         to: resource["deployment.environment.name"]
         if: attributes.deployment_environment_name != nil
+      - id: app-service-role-resource-direct
+        type: move
+        from: attributes.service_role
+        to: resource["service.role"]
+        if: attributes.service_role != nil
 
 processors:
   memory_limiter:

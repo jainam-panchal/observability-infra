@@ -25,6 +25,7 @@ It is intentionally generic and assumes:
 - set `OTEL_SERVICE_NAME`
 - set `OTEL_SERVICE_VERSION`
 - set `DEPLOYMENT_ENVIRONMENT`
+- set `OTEL_SERVICE_ROLE` (`api`/`worker`)
 - set `OTEL_EXPORTER_OTLP_ENDPOINT`
 - set `OTEL_TRACE_SAMPLING_RATE`
 - set `OTEL_TRACES_ENABLED`

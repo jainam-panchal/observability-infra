@@ -237,6 +237,7 @@ At minimum confirm:
 
 - `OTEL_SERVICE_NAME` is set
 - `DEPLOYMENT_ENVIRONMENT` is set
+- `OTEL_SERVICE_ROLE` is set
 - `OTEL_EXPORTER_OTLP_ENDPOINT` points to the local collector
 - traces are enabled
 - metrics are enabled

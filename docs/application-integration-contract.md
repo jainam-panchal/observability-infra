@@ -50,6 +50,7 @@ At minimum, the platform expects these variables to exist in the application con
 - `OTEL_SERVICE_NAME`
 - `OTEL_SERVICE_VERSION`
 - `DEPLOYMENT_ENVIRONMENT`
+- `OTEL_SERVICE_ROLE` (`api`, `worker`, or another stable role)
 - `OTEL_EXPORTER_OTLP_ENDPOINT`
 - `OTEL_TRACE_SAMPLING_RATE`
 - `OTEL_TRACES_ENABLED`
