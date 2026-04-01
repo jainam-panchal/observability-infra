@@ -113,6 +113,20 @@ Why it exists:
 - start with critical alerts and golden-signal dashboards
 - support generic Go Gin applications through documented collector and environment contracts
 
+## Guidebook
+
+Start with:
+
+- [docs/README.md](/home/jainam/repository/observability-infra/docs/README.md)
+
+That guidebook explains:
+
+- the system architecture
+- component responsibilities
+- signal flow
+- repository structure
+- why the stack is shaped the way it is
+
 ## Expected Areas
 
 - `collector/`
