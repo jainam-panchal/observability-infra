@@ -1174,7 +1174,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "Worker Debug",
   "uid": "worker-debug",
   "version": 1,

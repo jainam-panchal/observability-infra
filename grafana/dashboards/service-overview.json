@@ -1443,7 +1443,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "API Debug",
   "uid": "service-performance",
   "version": 1,

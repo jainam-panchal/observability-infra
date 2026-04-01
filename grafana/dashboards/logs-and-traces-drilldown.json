@@ -529,7 +529,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "Logs & Errors",
   "uid": "logs-and-errors",
   "version": 1,
