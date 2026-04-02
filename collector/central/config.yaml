@@ -16,6 +16,24 @@ processors:
     limit_mib: 512
     spike_limit_mib: 128
 
+  transform/logs_normalize:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - set(attributes["service_name"], resource.attributes["service.name"]) where attributes["service_name"] == nil and resource.attributes["service.name"] != nil
+          - set(attributes["deployment_environment_name"], resource.attributes["deployment.environment.name"]) where attributes["deployment_environment_name"] == nil and resource.attributes["deployment.environment.name"] != nil
+          - set(attributes["service_role"], resource.attributes["service.role"]) where attributes["service_role"] == nil and resource.attributes["service.role"] != nil
+          - set(attributes["level"], attributes["severity"]) where attributes["level"] == nil and attributes["severity"] != nil
+          - set(attributes["level"], attributes["severity_text"]) where attributes["level"] == nil and attributes["severity_text"] != nil
+
+  transform/metrics_scope_labels:
+    error_mode: ignore
+    metric_statements:
+      - context: datapoint
+        statements:
+          - set(attributes["otel_scope_name"], instrumentation_scope.name) where instrumentation_scope.name != nil
+
   attributes/loki:
     actions:
       - action: insert
@@ -74,6 +92,7 @@ service:
         - otlp
       processors:
         - memory_limiter
+        - transform/metrics_scope_labels
         - batch/default
       exporters:
         - prometheus
@@ -83,6 +102,7 @@ service:
         - otlp
       processors:
         - memory_limiter
+        - transform/logs_normalize
         - attributes/loki
         - resource/loki
         - batch/logs

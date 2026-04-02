@@ -1021,6 +1021,388 @@
       },
       "id": 21,
       "panels": [],
+      "title": "Worker Runtime",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 40
+      },
+      "id": 34,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "clamp_min(sum(rate(process_cpu_seconds_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval])), 0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU [Now]",
+      "type": "stat",
+      "description": "Current process CPU consumption rate for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 40
+      },
+      "id": 35,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(process_resident_memory_bytes{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Memory RSS [Now]",
+      "type": "stat",
+      "description": "Current process resident memory for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 40
+      },
+      "id": 36,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(go_goroutines{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Goroutines [Now]",
+      "type": "stat",
+      "description": "Current goroutine count for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "background"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 40
+      },
+      "id": 37,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(go_gc_last_pause_seconds{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}) or vector(0)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Last GC Pause [Now]",
+      "type": "stat",
+      "description": "Most recent observed GC pause for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 44
+      },
+      "id": 54,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(process_cpu_seconds_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "cpu",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Trend",
+      "type": "timeseries",
+      "description": "CPU consumption trend for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "memory rss"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 44
+      },
+      "id": 55,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(process_resident_memory_bytes{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
+          "legendFormat": "memory rss",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(go_goroutines{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
+          "legendFormat": "goroutines",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Memory & Goroutines Trend",
+      "type": "timeseries",
+      "description": "Process memory and goroutine trends for the selected worker service."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 38,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(go_gc_cycles_total{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "gc cycles/s",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(go_memstats_heap_alloc_bytes{deployment_environment_name=~\"$environment\",exported_job=~\"$service\"})",
+          "legendFormat": "heap bytes",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "GC And Heap Trend [Trend]",
+      "type": "timeseries",
+      "description": "GC churn and heap growth trend for the selected worker service."
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "id": 39,
+      "panels": [],
       "title": "Worker Logs",
       "type": "row"
     },
@@ -1033,7 +1415,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 40
+        "y": 57
       },
       "id": 14,
       "options": {
@@ -1053,7 +1435,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",service_name=~\".*worker.*\"} |~ \"(?i)error|fatal|panic\"",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",service_role=~\"worker|background\"} |~ \"(?i)error|fatal|panic\" | json | line_format \"[env={{.deployment_environment_name}} service={{.service_name}}] {{.body}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -1071,7 +1453,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 40
+        "y": 57
       },
       "id": 15,
       "options": {
@@ -1091,7 +1473,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",service_name=~\".*worker.*\"}",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",service_role=~\"worker|background\"} | json | line_format \"[env={{.deployment_environment_name}} service={{.service_name}}] {{.body}}\"",
           "queryType": "range",
           "refId": "A"
         }

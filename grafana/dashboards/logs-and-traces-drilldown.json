@@ -81,7 +81,7 @@
       },
       "targets": [
         {
-          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"}[$__range]))",
+          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"}[$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -125,7 +125,7 @@
       },
       "targets": [
         {
-          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\" [$__range]))",
+          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\" [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -169,7 +169,7 @@
       },
       "targets": [
         {
-          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"trace[_-]?id|traceid\" [$__range]))",
+          "expr": "sum(count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"trace[_-]?id|traceid\" [$__range])) or vector(0)",
           "queryType": "instant",
           "refId": "A"
         }
@@ -218,7 +218,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (service_name) (count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}[$__interval]))",
+          "expr": "sum by (service_name) (count_over_time({deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)${level:raw}\" [$__interval]))",
           "legendFormat": "{{service_name}}",
           "queryType": "range",
           "refId": "A"
@@ -391,7 +391,7 @@
       },
       "targets": [
         {
-          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\"",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} |~ \"(?i)error|fatal|panic\" | json | line_format \"[env={{.deployment_environment_name}} service={{.service_name}}] {{.body}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -423,7 +423,7 @@
       },
       "targets": [
         {
-          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\",level=~\"${level:raw}\"}",
+          "expr": "{deployment_environment_name=~\"${environment:raw}\",service_name=~\"${service:raw}\"} | json | line_format \"[env={{.deployment_environment_name}} service={{.service_name}}] {{.body}}\"",
           "queryType": "range",
           "refId": "A"
         }

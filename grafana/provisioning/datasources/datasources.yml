@@ -50,7 +50,7 @@ datasources:
       nodeGraph:
         enabled: true
       search:
-        hide: false
+        hide: true
       timeRangeForTags: 86400
       spanBar:
         type: Tag
